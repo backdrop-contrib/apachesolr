@@ -1583,7 +1583,7 @@ function apachesolr_do_query(DrupalSolrQueryInterface $current_query) {
       }
     }
     if ($qalt) {
-      $query->addParam('q.alt', implode(' ', $qalt));
+      $query->addParam('q.alt', implode(' AND ', $qalt));
     }
   }
   // We must run htmlspecialchars() here since converted entities are in the index.
