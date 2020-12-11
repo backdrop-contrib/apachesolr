@@ -1081,7 +1081,7 @@ function apachesolr_search_run_empty($name, array $params = array(), $base_path 
  * @param DrupalApacheSolrServiceInterface $solr
  *   The solr server resource to execute the search on.
  *
- * @return stdClass $response
+ * @return array The returned search results.
  *
  * @throws Exception
  */
@@ -1123,6 +1123,9 @@ function apachesolr_search_run($name, array $params = array(), $solrsort = '', $
   list($final_query, $response) = apachesolr_do_query($query);
   $env_id = $query->solr('getId');
   apachesolr_has_searched($env_id, TRUE);
+  if (NULL === $final_query) {
+    return $response;
+  }
   $process_response_callback = apachesolr_environment_variable_get($env_id, 'process_response_callback', 'apachesolr_search_process_response');
   if (function_exists($process_response_callback)) {
     return call_user_func($process_response_callback, $response, $final_query);
