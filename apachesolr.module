@@ -2882,7 +2882,7 @@ function apachesolr_environment_load_subrecords(&$environments) {
   $all_index_bundles_keyed = array();
   foreach ($all_index_bundles as $env_info) {
     extract($env_info);
-    $all_index_bundles_keyed[$env_id][$entity_type][] = $bundle;
+    $all_index_bundles_keyed[$env_id][$entity_type][$bundle] = $bundle;
   }
 
   $all_variables = db_select('apachesolr_environment_variable', 'v')
