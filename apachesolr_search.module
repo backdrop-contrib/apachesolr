@@ -186,7 +186,7 @@ function apachesolr_search_menu_alter(&$items) {
     // Tests whether apachesolr_search is the only enabled search module (in
     // which case there are no tabs).
     $active_module_info = search_get_info();
-    $no_tabs = (sizeof($active_module_info) == 1 && isset($active_module_info['apachesolr_search']));
+    $no_tabs = (sizeof($active_module_info) == 1 && isset($active_module_info['apachesolr_search']) && count($search_pages) == 1);
     // Tests whether we are simulating a core search tab.
     $core_search = ($parts[0] == 'search' && !$no_tabs);
     $position = array_search('%', $parts);
