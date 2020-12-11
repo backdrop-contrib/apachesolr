@@ -2821,12 +2821,7 @@ function theme_apachesolr_sort_link($vars) {
     $icon = ' ' . theme('tablesort_indicator', array('style' => $vars['direction']));
   }
   if ($vars['active']) {
-    if (isset($vars['options']['attributes']['class'])) {
-      $vars['options']['attributes']['class'] .= ' active';
-    }
-    else {
-      $vars['options']['attributes']['class'] = 'active';
-    }
+    $vars['options']['attributes']['class'][] = 'active';
   }
   return $icon . apachesolr_l($vars['text'], $vars['path'], $vars['options']);
 }
