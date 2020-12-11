@@ -361,10 +361,17 @@ function apachesolr_search_get_user_title($search_page_id = NULL, $value = NULL,
  */
 function apachesolr_search_get_value_title($search_page_id = NULL, $value = NULL, $terms = NULL) {
   $page_title = 'Search results';
-  if ((!empty($value) || !empty($terms)) && isset($search_page_id)) {
+  if (isset($search_page_id)) {
     $search_page = apachesolr_search_page_load($search_page_id);
+  }
+  if ((!empty($value) || !empty($terms)) && $search_page) {
     $page_title = str_replace('%value', '@value', $search_page['page_title']);
     $page_title = str_replace('%terms', '@terms', $page_title);
+  }
+  else if (isset($search_page_id) && $search_page && !empty($search_page['page_title'])) {
+    // Set the page title normally. This would normally get used for menu items linking to search pages.
+    $page_title = str_replace('%value', '', $search_page['page_title']);
+    $page_title = str_replace('%terms', '', $page_title);
   }
   return t($page_title, array(
     '@value' => $value,
