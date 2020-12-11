@@ -517,7 +517,9 @@ function apachesolr_search_page_settings_form_submit($form, &$form_state) {
   apachesolr_search_page_save($search_page);
 
   // Menu rebuild needed to pick up search path.
-  variable_set('menu_rebuild_needed', TRUE);
+  if ($form_state['values']['search_page']['search_path'] != $search_page['search_path']) {
+    variable_set('menu_rebuild_needed', TRUE);
+  }
 
   // Saves our values in the database, sets redirect path on success.
   drupal_set_message(t('The configuration options have been saved for %page.', array('%page' => $form_state['values']['label'])));
