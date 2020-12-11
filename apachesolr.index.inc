@@ -886,8 +886,9 @@ function apachesolr_index_node_solr_document(ApacheSolrDocument $document, $node
     // If there is no node teaser we will have to generate the teaser
     // ourselves. We have to be careful to not leak the author and other
     // information that is normally also not visible.
-    if (isset($node->body[$language][0]['safe_summary'])) {
-      $document->teaser = apachesolr_clean_text($node->body[$language][0]['safe_summary']);
+    $field_langcode = field_language('node', $node, 'body');
+    if (!empty($node->body[$field_langcode][0]['safe_summary'])) {
+      $document->teaser = apachesolr_clean_text($node->body[$field_langcode][0]['safe_summary']);
     }
     else {
       $document->teaser = truncate_utf8($document->content, 300, TRUE);
