@@ -43,7 +43,7 @@ function apachesolr_environment_delete_form(array $form, array &$form_state, arr
  */
 function apachesolr_environment_delete_form_submit(array $form, array &$form_state) {
   if (apachesolr_environment_delete($form_state['values']['env_id'])) {
-    drupal_set_message(t('The search environment was deleted'));
+    backdrop_set_message(t('The search environment was deleted'));
   }
   $form_state['redirect'] = 'admin/config/search/apachesolr/settings';
 }
@@ -53,8 +53,8 @@ function apachesolr_environment_edit_delete_submit($form, &$form_state) {
 
   // Regardlessly of the destination parameter we want to go to another page
   unset($_GET['destination']);
-  drupal_static_reset('drupal_get_destination');
-  drupal_get_destination();
+  backdrop_static_reset('backdrop_get_destination');
+  backdrop_get_destination();
 }
 
 /**
@@ -79,7 +79,7 @@ function apachesolr_environment_settings_page(array $environment = array()) {
       '#env_id' => $env_id,
     ),
   );
-  $output['form'] = drupal_get_form('apachesolr_environment_edit_form', $environment);
+  $output['form'] = backdrop_get_form('apachesolr_environment_edit_form', $environment);
   return $output;
 }
 
@@ -115,7 +115,7 @@ function apachesolr_environment_clone_form(array $form, array &$form_state, arra
  */
 function apachesolr_environment_clone_form_submit(array $form, array &$form_state) {
   if (apachesolr_environment_clone($form_state['values']['env_id'])) {
-    drupal_set_message(t('The search environment was cloned'));
+    backdrop_set_message(t('The search environment was cloned'));
   }
   $form_state['redirect'] = 'admin/config/search/apachesolr/settings';
 }
@@ -251,10 +251,10 @@ function apachesolr_environment_edit_form(array $form, array &$form_state, array
 function apachesolr_environment_edit_test_submit(array $form, array &$form_state) {
   $ping = apachesolr_server_status($form_state['values']['url'], $form_state['values']['service_class']);
   if ($ping) {
-    drupal_set_message(t('Your site has contacted the Apache Solr server.'));
+    backdrop_set_message(t('Your site has contacted the Apache Solr server.'));
   }
   else {
-    drupal_set_message(t('Your site was unable to contact the Apache Solr server.'), 'error');
+    backdrop_set_message(t('Your site was unable to contact the Apache Solr server.'), 'error');
   }
   $form_state['rebuild'] = TRUE;
 }
@@ -299,7 +299,7 @@ function apachesolr_environment_edit_submit(array $form, array &$form_state) {
     apachesolr_set_default_environment($form_state['values']['env_id']);
   }
   cache_clear_all('apachesolr:environments', 'cache_apachesolr');
-  drupal_set_message(t('The %name search environment has been saved.', array('%name' => $form_state['values']['name'])));
+  backdrop_set_message(t('The %name search environment has been saved.', array('%name' => $form_state['values']['name'])));
   if ($form_state['values']['op'] == t('Save')) {
     $form_state['redirect'] = 'admin/config/search/apachesolr/settings';
   }
@@ -308,8 +308,8 @@ function apachesolr_environment_edit_submit(array $form, array &$form_state) {
   }
   // Regardlessly of the destination parameter we want to go to another page
   unset($_GET['destination']);
-  drupal_static_reset('drupal_get_destination');
-  drupal_get_destination();
+  backdrop_static_reset('backdrop_get_destination');
+  backdrop_get_destination();
 }
 
 /**
@@ -324,10 +324,10 @@ function apachesolr_check_facetapi() {
     $filename = db_query_range("SELECT filename FROM {system} WHERE type = 'module' AND name = 'facetapi'", 0, 1)
       ->fetchField();
     if ($filename && file_exists($filename)) {
-      drupal_set_message(t('If you <a href="@modules">enable the facetapi module</a>, Apache Solr Search will provide you with configurable facets.', array('@modules' => url('admin/modules'))));
+      backdrop_set_message(t('If you <a href="@modules">enable the facetapi module</a>, Apache Solr Search will provide you with configurable facets.', array('@modules' => url('admin/modules'))));
     }
     else {
-      drupal_set_message(t('If you install the facetapi module from !href, Apache Solr Search will provide you with configurable facets.', array('!href' => url('http://drupal.org/project/facetapi'))));
+      backdrop_set_message(t('If you install the facetapi module from !href, Apache Solr Search will provide you with configurable facets.', array('!href' => url('http://drupal.org/project/facetapi'))));
     }
   }
 }
@@ -341,6 +341,7 @@ function apachesolr_check_facetapi() {
  * @return array Output of the system_settings_form()
  */
 function apachesolr_settings(array $form, array &$form_state) {
+  $config = config('apachesolr.settings');
   $form = array();
   $rows = array();
 
@@ -455,17 +456,17 @@ function apachesolr_settings(array $form, array &$form_state) {
         ),
         check_plain($data['url']),
       ),
-      'class' => array(drupal_html_class($class)),
+      'class' => array(backdrop_html_class($class)),
     );
     // Add the links to the page
     $rows[$environment_id]['data'] = array_merge($rows[$environment_id]['data'], $confs);
     $rows[$environment_id]['data'] = array_merge($rows[$environment_id]['data'], $ops);
   }
   // Custom CSS for Admin ApacheSolr table.
-  $form['#attached']['css'][] = drupal_get_path('module', 'apachesolr') . '/apachesolr.css';
+  $form['#attached']['css'][] = backdrop_get_path('module', 'apachesolr') . '/apachesolr.css';
 
   $form['apachesolr_host_settings']['actions'] = array(
-    '#markup' => '<ul class="action-links">' . drupal_render($actions) . '</ul>',
+    '#markup' => '<ul class="action-links">' . backdrop_render($actions) . '</ul>',
   );
   $form['apachesolr_host_settings']['table'] = array(
     '#theme' => 'table',
@@ -484,13 +485,13 @@ function apachesolr_settings(array $form, array &$form_state) {
     '#type' => 'radios',
     '#title' => t('Extra help messages for administrators'),
     '#description' => t('Adds notices to a page whenever Drupal changed content that needs reindexing'),
-    '#default_value' => variable_get('apachesolr_set_nodeapi_messages', 1),
+    '#default_value' => $config->get('apachesolr_set_nodeapi_messages'),
     '#options' => array(0 => t('Disabled'), 1 => t('Enabled')),
   );
 
   // Number of Items to index
-  $numbers = drupal_map_assoc(array(1, 5, 10, 20, 50, 100, 200));
-  $default_cron_limit = variable_get('apachesolr_cron_limit', 50);
+  $numbers = backdrop_map_assoc(array(1, 5, 10, 20, 50, 100, 200));
+  $default_cron_limit = $config->get('apachesolr_cron_limit');
 
   // apachesolr_cron_limit may be overridden in settings.php. If its current
   // value is not among the default set of options, add it.
@@ -522,17 +523,29 @@ function apachesolr_settings(array $form, array &$form_state) {
     '#type' => 'select',
     '#title' => t('On failure'),
     '#options' => $options,
-    '#default_value' => variable_get('apachesolr_failure', 'apachesolr:show_error'),
+    '#default_value' => $config->get('apachesolr_failure'),
   );
 
   $form['advanced']['apachesolr_watchdog_successes'] = array(
     '#type' => 'checkbox',
     '#title' => t('Log successful Apache Solr Search actions'),
     '#description' => t('Watchdog will log successful adds and indexes.'),
-    '#default_value' => variable_get('apachesolr_watchdog_successes', TRUE),
+    '#default_value' => $config->get('apachesolr_watchdog_successes'),
   );
-
+  $form['#submit'][] = 'apachesolr_settings_form_submit';
   return system_settings_form($form);
+}
+
+function apachesolr_settings_form_submit ($form, &$form_state) {
+  $apachesolr_set_nodeapi_messages = $form_state['values']['apachesolr_set_nodeapi_messages'];
+  $apachesolr_cron_limit = $form_state['values']['apachesolr_cron_limit'];
+  $apachesolr_failure = $form_state['values']['apachesolr_failure'];
+  $apachesolr_watchdog_successes = $form_state['values']['apachesolr_watchdog_successes'];
+
+  config_set('apachesolr.settings', 'apachesolr_set_nodeapi_messages', $apachesolr_set_nodeapi_messages);
+  config_set('apachesolr.settings', 'apachesolr_cron_limit', $apachesolr_cron_limit);
+  config_set('apachesolr.settings', 'apachesolr_failure', $apachesolr_failure);
+  config_set('apachesolr.settings', 'apachesolr_watchdog_successes', $apachesolr_watchdog_successes);
 }
 
 /**
@@ -554,7 +567,7 @@ function apachesolr_status_page($environment = array()) {
 
   // Check for availability
   if (!apachesolr_server_status($environment['url'], $environment['service_class'])) {
-    drupal_set_message(t('The server seems to be unavailable. Please verify the server settings at the <a href="!settings_page">settings page</a>', array('!settings_page' => url("admin/config/search/apachesolr/settings/{$environment['env_id']}/edit", array('query' =>  drupal_get_destination())))), 'warning');
+    backdrop_set_message(t('The server seems to be unavailable. Please verify the server settings at the <a href="!settings_page">settings page</a>', array('!settings_page' => url("admin/config/search/apachesolr/settings/{$environment['env_id']}/edit", array('query' =>  backdrop_get_destination())))), 'warning');
     return '';
   }
 
@@ -565,7 +578,7 @@ function apachesolr_status_page($environment = array()) {
   }
   catch (Exception $e) {
     apachesolr_log_exception($environment['env_id'], $e);
-    drupal_set_message(nl2br(check_plain($e->getMessage())), "warning");
+    backdrop_set_message(nl2br(check_plain($e->getMessage())), "warning");
     $data = new stdClass;
     $data->fields = array();
   }
@@ -582,7 +595,7 @@ function apachesolr_status_page($environment = array()) {
       if (preg_match('/^drupal-[13]/', $stats_summary['@schema_version'])) {
         $minimum = 'drupal-3.0-beta4';
         if (version_compare($stats_summary['@schema_version'], $minimum, '<')) {
-          drupal_set_message(t('Your schema.xml version is too old. You must update it to at least %minimum and re-index your content.', array('%minimum' => $minimum)), 'error');
+          backdrop_set_message(t('Your schema.xml version is too old. You must update it to at least %minimum and re-index your content.', array('%minimum' => $minimum)), 'error');
         }
       }
       $pending_msg = $stats_summary['@pending_docs'] ? t('(@pending_docs sent but not yet processed)', $stats_summary) : '';
@@ -630,11 +643,11 @@ function apachesolr_status_page($environment = array()) {
 
   $write_status = apachesolr_environment_variable_get($env_id, 'apachesolr_read_only', APACHESOLR_READ_WRITE);
   if ($write_status == APACHESOLR_READ_WRITE) {
-     $output['index_action_form'] = drupal_get_form('apachesolr_index_action_form', $env_id);
-     $output['index_config_form'] = drupal_get_form('apachesolr_index_config_form', $env_id);
+     $output['index_action_form'] = backdrop_get_form('apachesolr_index_action_form', $env_id);
+     $output['index_config_form'] = backdrop_get_form('apachesolr_index_config_form', $env_id);
   }
   else {
-    drupal_set_message(t('Options for deleting and re-indexing are not available because the index is read-only. This can be changed on the <a href="!settings_page">settings page</a>', array('!settings_page' => url('admin/config/search/apachesolr/settings/' . $env_id . '/edit', array('query' =>  drupal_get_destination())))), 'warning');
+    backdrop_set_message(t('Options for deleting and re-indexing are not available because the index is read-only. This can be changed on the <a href="!settings_page">settings page</a>', array('!settings_page' => url('admin/config/search/apachesolr/settings/' . $env_id . '/edit', array('query' =>  backdrop_get_destination())))), 'warning');
   }
 
   return $output;
@@ -652,9 +665,10 @@ function apachesolr_status_page($environment = array()) {
  *   Page render array.
  */
 function apachesolr_index_report(array $environment = array()) {
+  $config = config('apachesolr.settings');
   if (empty($environment)) {
     $env_id = apachesolr_default_environment();
-    drupal_goto('admin/reports/apachesolr/' . $env_id);
+    backdrop_goto('admin/reports/apachesolr/' . $env_id);
   }
   $environments = apachesolr_load_all_environments();
   $environments_list = array();
@@ -674,14 +688,14 @@ function apachesolr_index_report(array $environment = array()) {
   }
   catch (Exception $e) {
     apachesolr_log_exception($environment['env_id'], $e);
-    drupal_set_message(nl2br(check_plain($e->getMessage())), "warning");
+    backdrop_set_message(nl2br(check_plain($e->getMessage())), "warning");
     return $output;
   }
 
   $messages = array();
   $messages[] = array(t('Number of documents in index'), $data->index->numDocs);
 
-  $limit = variable_get('apachesolr_luke_limit', 20000);
+  $limit = $config->get('apachesolr_luke_limit');
   if (isset($data->index->numDocs) && $data->index->numDocs > $limit) {
     $messages[] = array(
       t('Limit'),
@@ -777,7 +791,7 @@ function apachesolr_config_files_overview(array $environment = array()) {
   }
   catch (Exception $e) {
     apachesolr_log_exception($env_id, $e);
-    drupal_set_message(nl2br(check_plain($e->getMessage())), "warning");
+    backdrop_set_message(nl2br(check_plain($e->getMessage())), "warning");
   }
 
   if ($xml) {
@@ -853,11 +867,11 @@ function apachesolr_config_file($name, array $environment = array()) {
     $response = $solr->makeServletRequest('admin/file', array('file' => $name));
     $raw_file = $response->data;
     $output = '<pre>' . check_plain($raw_file) . '</pre>';
-    drupal_set_title(check_plain($name));
+    backdrop_set_title(check_plain($name));
   }
   catch (Exception $e) {
     apachesolr_log_exception($env_id, $e);
-    drupal_set_message(nl2br(check_plain($e->getMessage())), "warning");
+    backdrop_set_message(nl2br(check_plain($e->getMessage())), "warning");
   }
   return $output;
 }
@@ -874,6 +888,7 @@ function apachesolr_config_file($name, array $environment = array()) {
  * @return array $form
  */
 function apachesolr_index_action_form(array $form, array $form_state, $env_id) {
+  $config = config('apachesolr.settings');
   $form = array();
   $form['action'] = array(
     '#type' => 'fieldset',
@@ -889,7 +904,7 @@ function apachesolr_index_action_form(array $form, array $form_state, $env_id) {
   $form['action']['cron'] = array(
     '#prefix' => '<div>',
     '#type' => 'submit',
-    '#value' => t('Index queued content (!amount)', array('!amount' => variable_get('apachesolr_cron_limit', 50))),
+    '#value' => t('Index queued content (!amount)', array('!amount' => $config->get('apachesolr_cron_limit'))),
     '#submit' => array('apachesolr_index_action_form_cron_submit'),
   );
   $form['action']['cron_description'] = array(
@@ -941,7 +956,7 @@ function apachesolr_index_action_form(array $form, array $form_state, $env_id) {
 function apachesolr_index_action_form_remaining_submit(array $form, array &$form_state) {
   $destination = array();
   if (isset($_GET['destination'])) {
-    $destination = drupal_get_destination();
+    $destination = backdrop_get_destination();
     unset($_GET['destination']);
   }
   $env_id = $form_state['values']['env_id'];
@@ -957,7 +972,7 @@ function apachesolr_index_action_form_remaining_submit(array $form, array &$form
 function apachesolr_index_action_form_delete_submit(array $form, array &$form_state) {
   $destination = array();
   if (isset($_GET['destination'])) {
-    $destination = drupal_get_destination();
+    $destination = backdrop_get_destination();
     unset($_GET['destination']);
   }
   $env_id = $form_state['values']['env_id'];
@@ -973,7 +988,7 @@ function apachesolr_index_action_form_delete_submit(array $form, array &$form_st
 function apachesolr_index_action_form_reset_submit(array $form, array &$form_state) {
   $destination = array();
   if (isset($_GET['destination'])) {
-    $destination = drupal_get_destination();
+    $destination = backdrop_get_destination();
     unset($_GET['destination']);
   }
   $env_id = $form_state['values']['env_id'];
@@ -996,7 +1011,7 @@ function apachesolr_index_action_form_cron_submit(array $form, array &$form_stat
     $form_state['redirect'] = 'admin/config/search/apachesolr';
   }
   apachesolr_cron($env_id);
-  drupal_set_message(t('Apachesolr cron successfully executed'));
+  backdrop_set_message(t('Apachesolr cron successfully executed'));
 }
 
 /**
@@ -1074,7 +1089,7 @@ function apachesolr_index_action_form_reset_confirm_submit(array $form, array &$
   }
   module_load_include('inc', 'apachesolr', 'apachesolr.index');
   apachesolr_index_mark_for_reindex($env_id);
-  drupal_set_message(t('All the content on your site is queued for indexing. You can wait for it to be indexed during cron runs, or you can manually reindex it.'));
+  backdrop_set_message(t('All the content on your site is queued for indexing. You can wait for it to be indexed during cron runs, or you can manually reindex it.'));
 }
 
 /**
@@ -1115,10 +1130,10 @@ function apachesolr_index_action_form_delete_confirm_submit(array $form, array &
   // Rebuild our tracking table.
   module_load_include('inc', 'apachesolr', 'apachesolr.index');
   if (apachesolr_index_delete_index($env_id)) {
-    drupal_set_message(t('The index has been deleted.'));
+    backdrop_set_message(t('The index has been deleted.'));
   }
   else {
-    drupal_set_message(t('An error occured while trying to delete the index.'), 'error');
+    backdrop_set_message(t('An error occured while trying to delete the index.'), 'error');
   }
 }
 
@@ -1144,7 +1159,7 @@ function apachesolr_index_batch_index_remaining($env_id, $total_limit = null) {
     'init_message' => t('Preparing to submit content to Solr for indexing...'),
     'progress_message' => t('Submitting content to Solr...'),
     'error_message' => t('Solr indexing has encountered an error.'),
-    'file' => drupal_get_path('module', 'apachesolr') . '/apachesolr.admin.inc',
+    'file' => backdrop_get_path('module', 'apachesolr') . '/apachesolr.admin.inc',
   );
   batch_set($batch);
 }
@@ -1166,6 +1181,7 @@ function apachesolr_index_batch_index_remaining($env_id, $total_limit = null) {
  *   When solr gives an error, throw an exception that solr is not available
  */
 function apachesolr_index_batch_index_entities($env_id, $total_limit = NULL, &$context = []) {
+  $config = config('apachesolr.settings');
   // If no context was defined for the batch return false.
   if (empty($context)) {
     return FALSE;
@@ -1201,7 +1217,7 @@ function apachesolr_index_batch_index_entities($env_id, $total_limit = NULL, &$c
 
   // We can safely process the apachesolr_cron_limit nodes at a time without a
   // timeout or out of memory error.
-  $limit = variable_get('apachesolr_cron_limit', 50);
+  $limit = $config->get('apachesolr_cron_limit' );
 
   // Reduce the limit for our final batch if we would be processing more than had been requested
   if ($limit + $context['sandbox']['progress'] > $context['sandbox']['max']) {
@@ -1269,7 +1285,7 @@ function apachesolr_index_batch_index_finished($success, array $results, array $
     $message .= ' ' . t('An error occurred while processing @num with arguments: @args', array('@num' => $error_operation[0], '@args' => print_r($error_operation[0], TRUE)));
     $type = 'error';
   }
-  drupal_set_message($message, $type);
+  backdrop_set_message($message, $type);
 }
 
 /**
@@ -1353,14 +1369,14 @@ function apachesolr_index_config_form_submit(array $form, array &$form_state) {
       }
     }
     else {
-      drupal_set_message(t('Search is temporarily unavailable. If the problem persists, please contact the site administrator.'), 'error');
+      backdrop_set_message(t('Search is temporarily unavailable. If the problem persists, please contact the site administrator.'), 'error');
     }
   }
 
   // Clear the entity cache, since we will be changing its data.
   entity_info_cache_clear();
   cache_clear_all('apachesolr:environments', 'cache_apachesolr');
-  drupal_set_message(t('Your settings have been saved.'));
+  backdrop_set_message(t('Your settings have been saved.'));
 }
 
 /**

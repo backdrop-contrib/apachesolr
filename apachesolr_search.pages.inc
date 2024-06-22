@@ -11,8 +11,8 @@
 function apachesolr_search_custom_page($page_id, $keys = '', $path_replacer = NULL) {
   $search_page = apachesolr_search_page_load($page_id);
   if (empty($search_page)) {
-    drupal_set_message(t('This search page cannot be found'), 'error');
-    return drupal_not_found();
+    backdrop_set_message(t('This search page cannot be found'), 'error');
+    return backdrop_not_found();
   }
   // Activate the page context, if the module is enabled.
   if ((module_exists('context')) && ($plugin = context_get_plugin('condition', 'apachesolr_page'))) {
@@ -33,7 +33,7 @@ function apachesolr_search_custom_page($page_id, $keys = '', $path_replacer = NU
   // Add a custom search form if required
   if (!empty($search_page['settings']['apachesolr_search_search_box'])) {
     // Adds the search form to the page.
-    $build['search_form'] = drupal_get_form('apachesolr_search_custom_page_search_form', $search_page, $keys, $conditions);
+    $build['search_form'] = backdrop_get_form('apachesolr_search_custom_page_search_form', $search_page, $keys, $conditions);
   }
   // Retrieve the results of the search
   $results = apachesolr_search_search_results($keys, $conditions, $search_page);
@@ -47,7 +47,7 @@ function apachesolr_search_custom_page($page_id, $keys = '', $path_replacer = NU
  */
 function apachesolr_search_custom_page_search_form($form, &$form_state, $search_page, $keys = '', $conditions = array()) {
   // Loads the core Search CSS file, use the core search module's classes.
-  drupal_add_css(drupal_get_path('module', 'search') . '/search.css');
+  backdrop_add_css(backdrop_get_path('module', 'search') . '/search.css');
 
   $form = array();
   $form['#id'] = 'search-form';

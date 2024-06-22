@@ -174,7 +174,7 @@ class DrupalApacheSolrService implements DrupalApacheSolrServiceInterface {
   protected function setSystemInfo() {
     $url = $this->_constructUrl(self::SYSTEM_SERVLET, array('wt' => 'json'));
     if ($this->env_id) {
-      $this->system_info_cid = $this->env_id . ":system:" . drupal_hash_base64($url);
+      $this->system_info_cid = $this->env_id . ":system:" . backdrop_hash_base64($url);
       $cache = cache_get($this->system_info_cid, 'cache_apachesolr');
       if (isset($cache->data)) {
         $this->system_info = json_decode($cache->data);
@@ -215,7 +215,7 @@ class DrupalApacheSolrService implements DrupalApacheSolrServiceInterface {
       );
       $url = $this->_constructUrl(self::LUKE_SERVLET, $params);
       if ($this->env_id) {
-        $cid = $this->env_id . ":luke:" . drupal_hash_base64($url);
+        $cid = $this->env_id . ":luke:" . backdrop_hash_base64($url);
         $cache = cache_get($cid, 'cache_apachesolr');
         if (isset($cache->data)) {
           $this->luke = $cache->data;
@@ -279,7 +279,7 @@ class DrupalApacheSolrService implements DrupalApacheSolrServiceInterface {
         $url = $this->_constructUrl(self::STATS_SERVLET);
       }
       if ($this->env_id) {
-        $this->stats_cid = $this->env_id . ":stats:" . drupal_hash_base64($url);
+        $this->stats_cid = $this->env_id . ":stats:" . backdrop_hash_base64($url);
         $cache = cache_get($this->stats_cid, 'cache_apachesolr');
         if (isset($cache->data)) {
           $this->stats = simplexml_load_string($cache->data);
@@ -502,7 +502,7 @@ class DrupalApacheSolrService implements DrupalApacheSolrServiceInterface {
    *   Any request parameters when constructing the URL.
    *
    * @param array $options
-   *  @see drupal_http_request() $options.
+   *  @see backdrop_http_request() $options.
    *
    * @return
    *  response object
@@ -545,7 +545,7 @@ class DrupalApacheSolrService implements DrupalApacheSolrServiceInterface {
   /**
    * Central method for making the actual http request to the Solr Server
    *
-   * This is just a wrapper around drupal_http_request().
+   * This is just a wrapper around backdrop_http_request().
    */
   protected function _makeHttpRequest($url, array $options = array()) {
     if (!isset($options['method']) || $options['method'] == 'GET' || $options['method'] == 'HEAD') {
@@ -553,7 +553,7 @@ class DrupalApacheSolrService implements DrupalApacheSolrServiceInterface {
       $options['data'] = NULL;
     }
 
-    $result = drupal_http_request($url, $options);
+    $result = backdrop_http_request($url, $options);
     if (empty($result->status_message)) {
       $result->status_message = '[unknown error]';
     }

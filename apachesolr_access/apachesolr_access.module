@@ -14,11 +14,11 @@
  *   this code so it can be ignored
  */
 function apachesolr_access_apachesolr_index_document_build_node(ApacheSolrDocument $document, $node, $env_id) {
-  $account = &drupal_static(__FUNCTION__);
+  $account = &backdrop_static(__FUNCTION__);
 
   if (!isset($account)) {
     // Load the anonymous user.
-    $account = drupal_anonymous_user();
+    $account = backdrop_anonymous_user();
   }
 
   // When using a node access module like Domain Access which has
@@ -189,7 +189,7 @@ function apachesolr_access_environment_edit_form_submit($form, &$form_state) {
  *
  */
 function apachesolr_access_rebuild_nodeaccess($form, $form_state) {
-  drupal_set_message(t('Solr search index will be rebuilt.'));
+  backdrop_set_message(t('Solr search index will be rebuilt.'));
   // Clear last updated
   apachesolr_clear_last_index_position();
 }
@@ -200,7 +200,7 @@ function apachesolr_access_rebuild_nodeaccess($form, $form_state) {
  * On enabling the module, tell the user to reindex
  */
 function apachesolr_access_enable() {
-  drupal_set_message(t('Your content <a href="@url">must be re-indexed</a> before Apache Solr Access will be functional on searches.', array('@url' => url('admin/config/search/apachesolr/index'))), 'warning');
+  backdrop_set_message(t('Your content <a href="@url">must be re-indexed</a> before Apache Solr Access will be functional on searches.', array('@url' => url('admin/config/search/apachesolr/index'))), 'warning');
 }
 
 /**

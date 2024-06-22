@@ -1,5 +1,5 @@
 
-This module integrates Drupal with the Apache Solr search platform. Solr search
+This module integrates Backdrop with the Apache Solr search platform. Solr search
 can be used as a replacement for core content search and boasts both extra
 features and better performance. Among the extra features is the ability to have
 faceted search on facets ranging from content author to taxonomy to arbitrary
@@ -28,8 +28,8 @@ Installation
 
 Prerequisite: Java 5 or higher (a.k.a. 1.5.x).  PHP 5.2.4 or higher.
 
-Install the Apache Solr Drupal module as you would any Drupal module. Note
-that the Drupal 7.x-1.x branch does not require the SolrPhpClient to
+Install the Apache Solr Backdrop module as you would any Backdrop module. Note
+that the Backdrop branch does not require the SolrPhpClient to
 be installed. All necessary code is now included with this module.
 
 Before enabling the module, you must have a working Solr server, or be
@@ -43,17 +43,17 @@ http://www.apache.org/dyn/closer.cgi/lucene/solr/
 
 Apache Lucene 3.1, 3.2 or 3.3, have a possible index corruption bug on
 server crash or power loss (LUCENE-3418) and have bugs that interfere
-with the Drupal admin reports. Solr 3.4 has a problem with
+with the Backdrop admin reports. Solr 3.4 has a problem with
 SortMissingLast so Solr 3.5.0 or later is strongly preferred.
 
 Unpack the Solr tarball somewhere not visible to the web (not in your
-webserver docroot and not inside of your Drupal directory).
+webserver docroot and not inside of your Backdrop directory).
 
 The Solr download comes with an example application that you can use for
 testing, development, and even for smaller production sites. This
 application is found at apache-solr-1.4.1/example.
 
-You must use 3 Solr configuration files that come with the Drupal
+You must use 3 Solr configuration files that come with the Backdrop
 module or the integration will not work correctly.
 
 For Solr 1.4 use the ones found in:
@@ -69,7 +69,7 @@ For example, when deploying solr 1.4:
 
 Move apache-solr-1.4.1/example/solr/conf/schema.xml and rename it to
 something like schema.bak. Then move the solr-conf/solr-1.4/schema.xml
-that comes with this Drupal module to take its place.
+that comes with this Backdrop module to take its place.
 
 Similarly, move apache-solr-1.4.1/example/solr/conf/solrconfig.xml and rename
 it like solrconfig.bak. Then move the solr-conf/solr-1.4/solrconfig.xml
@@ -97,14 +97,14 @@ http://localhost:8983/solr/admin/
 
 Now, you should enable the "Apache Solr framework" and "Apache Solr search"
 modules. Check that you can connect to Solr at ?q=admin/setting/apachesolr
-Now run cron on your Drupal site until your content is indexed. You
+Now run cron on your Backdrop site until your content is indexed. You
 can monitor the index at ?q=admin/settings/apachesolr/index
 
 The solrconfig.xml that comes with this modules defines auto-commit, so
 it may take a few minutes between running cron and when the new content
 is visible in search.
 
-To use facets you should download facetapi http://drupal.org/project/facetapi
+To use facets you should download facetapi https://backdropcms.org/project/facetapi
 This module will allow you to define and set facets next to your search pages.
 Once this module is enabled, enable blocks for facets first at
 Administer > Site configuration > Apache Solr > Enabled filters

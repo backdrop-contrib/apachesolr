@@ -178,7 +178,7 @@ class SolrFilterSubQuery {
       }
 
       // For the value we allow anything that is UTF8
-      if (!drupal_validate_utf8($value)) {
+      if (!backdrop_validate_utf8($value)) {
         return FALSE;
       }
 

@@ -35,7 +35,7 @@ function apachesolr_menu() {
   $items['admin/config/search/apachesolr/settings'] = array(
     'title'              => 'Settings',
     'weight'             => 10,
-    'page callback'      => 'drupal_get_form',
+    'page callback'      => 'backdrop_get_form',
     'page arguments'     => array('apachesolr_settings'),
     'access arguments'   => array('administer search'),
     'file'               => 'apachesolr.admin.inc',
@@ -54,7 +54,7 @@ function apachesolr_menu() {
   );
   $items[$settings_path . '%apachesolr_environment/index/remaining'] = array(
     'title'              => 'Remaining',
-    'page callback'      => 'drupal_get_form',
+    'page callback'      => 'backdrop_get_form',
     'page arguments'     => array('apachesolr_index_action_form_remaining_confirm', 5),
     'file'               => 'apachesolr.admin.inc',
     'access arguments'   => array('administer search'),
@@ -62,7 +62,7 @@ function apachesolr_menu() {
   );
   $items[$settings_path . '%apachesolr_environment/index/delete'] = array(
     'title'              => 'Reindex',
-    'page callback'      => 'drupal_get_form',
+    'page callback'      => 'backdrop_get_form',
     'page arguments'     => array('apachesolr_index_action_form_delete_confirm', 5),
     'file'               => 'apachesolr.admin.inc',
     'access arguments'   => array('administer search'),
@@ -70,7 +70,7 @@ function apachesolr_menu() {
   );
   $items[$settings_path . '%apachesolr_environment/index/reset'] = array(
     'title'              => 'Reindex',
-    'page callback'      => 'drupal_get_form',
+    'page callback'      => 'backdrop_get_form',
     'page arguments'     => array('apachesolr_index_action_form_reset_confirm', 5),
     'file'               => 'apachesolr.admin.inc',
     'access arguments'   => array('administer search'),
@@ -78,7 +78,7 @@ function apachesolr_menu() {
   );
   $items[$settings_path . '%apachesolr_environment/index/reset/confirm'] = array(
     'title'              => 'Confirm the re-indexing of all content',
-    'page callback'      => 'drupal_get_form',
+    'page callback'      => 'backdrop_get_form',
     'page arguments'     => array('apachesolr_clear_index_confirm', 5),
     'access arguments'   => array('administer search'),
     'file'               => 'apachesolr.admin.inc',
@@ -86,7 +86,7 @@ function apachesolr_menu() {
   );
   $items[$settings_path . '%apachesolr_environment/index/delete/confirm'] = array(
     'title'              => 'Confirm index deletion',
-    'page callback'      => 'drupal_get_form',
+    'page callback'      => 'backdrop_get_form',
     'page arguments'     => array('apachesolr_delete_index_confirm', 5),
     'access arguments'   => array('administer search'),
     'file'               => 'apachesolr.admin.inc',
@@ -94,7 +94,7 @@ function apachesolr_menu() {
   );
   $items[$settings_path . '%apachesolr_environment/edit'] = array(
     'title'              => 'Edit',
-    'page callback'      => 'drupal_get_form',
+    'page callback'      => 'backdrop_get_form',
     'page arguments'     => array('apachesolr_environment_edit_form', 5),
     'description'        => 'Edit Apache Solr search environment.',
     'access arguments'   => array('administer search'),
@@ -104,14 +104,14 @@ function apachesolr_menu() {
   );
   $items[$settings_path . '%apachesolr_environment/clone'] = array(
     'title'              => 'Apache Solr search environment clone',
-    'page callback'      => 'drupal_get_form',
+    'page callback'      => 'backdrop_get_form',
     'page arguments'     => array('apachesolr_environment_clone_form', 5),
     'access arguments'   => array('administer search'),
     'file'               => 'apachesolr.admin.inc',
   );
   $items[$settings_path . '%apachesolr_environment/delete'] = array(
     'title'              => 'Apache Solr search environment delete',
-    'page callback'      => 'drupal_get_form',
+    'page callback'      => 'backdrop_get_form',
     'page arguments'     => array('apachesolr_environment_delete_form', 5),
     'access callback'    => 'apachesolr_environment_delete_page_access',
     'access arguments'   => array('administer search', 5),
@@ -120,7 +120,7 @@ function apachesolr_menu() {
   $items[$settings_path . 'add'] = array(
     'title'              => 'Add search environment',
     'description'        => 'Add Apache Solr environment.',
-    'page callback'      => 'drupal_get_form',
+    'page callback'      => 'backdrop_get_form',
     'page arguments'     => array('apachesolr_environment_edit_form'),
     'access arguments'   => array('administer search'),
     'file'               => 'apachesolr.admin.inc',
@@ -128,7 +128,7 @@ function apachesolr_menu() {
   );
   $items['admin/config/search/apachesolr/index/confirm/clear'] = array(
     'title'              => 'Confirm the re-indexing of all content',
-    'page callback'      => 'drupal_get_form',
+    'page callback'      => 'backdrop_get_form',
     'page arguments'     => array('apachesolr_clear_index_confirm'),
     'access arguments'   => array('administer search'),
     'file'               => 'apachesolr.admin.inc',
@@ -136,7 +136,7 @@ function apachesolr_menu() {
   );
   $items['admin/config/search/apachesolr/index/confirm/delete'] = array(
     'title'              => 'Confirm index deletion',
-    'page callback'      => 'drupal_get_form',
+    'page callback'      => 'backdrop_get_form',
     'page arguments'     => array('apachesolr_delete_index_confirm'),
     'access arguments'   => array('administer search'),
     'file'               => 'apachesolr.admin.inc',
@@ -193,7 +193,7 @@ function apachesolr_menu() {
 
   // We handle our own menu paths for facets
   if (module_exists('facetapi')) {
-    $file_path = drupal_get_path('module', 'facetapi');
+    $file_path = backdrop_get_path('module', 'facetapi');
     $first = TRUE;
     foreach (facetapi_get_realm_info() as $realm_name => $realm) {
       if ($first) {
@@ -248,7 +248,7 @@ function apachesolr_enabled_facets_page($realm_name, $environment = NULL) {
     '#theme' => 'apachesolr_settings_title',
     '#env_id' => $env_id,
   );
-  $page['settings'] = drupal_get_form('facetapi_realm_settings_form', $searcher, $realm_name);
+  $page['settings'] = backdrop_get_form('facetapi_realm_settings_form', $searcher, $realm_name);
   return $page;
 }
 
@@ -540,11 +540,12 @@ function apachesolr_mark_book_outline_node($form, $form_state) {
  *   The search query that was issued at the time of failure.
  */
 function apachesolr_failure($search_name, $querystring) {
-  $fail_rule = variable_get('apachesolr_failure', 'apachesolr:show_error');
+  $config = config('apachesolr.settings');
+  $fail_rule = $config->get('apachesolr_failure');
 
   switch ($fail_rule) {
     case 'apachesolr:show_error':
-      drupal_set_message(t('Search is temporarily unavailable. If the problem persists, please contact the site administrator.'), 'error');
+      backdrop_set_message(t('Search is temporarily unavailable. If the problem persists, please contact the site administrator.'), 'error');
       break;
     case 'apachesolr:show_no_results':
       // Do nothing.
@@ -555,8 +556,8 @@ function apachesolr_failure($search_name, $querystring) {
         $search_info = search_get_info();
         if (isset($search_info[$fail_rule])) {
           $search_info = $search_info[$fail_rule];
-          drupal_set_message(t("%search_name is not available. Your search is being redirected.", array('%search_name' => $search_name)));
-          drupal_goto('search/' . $search_info['path'] . '/' . rawurlencode($querystring));
+          backdrop_set_message(t("%search_name is not available. Your search is being redirected.", array('%search_name' => $search_name)));
+          backdrop_goto('search/' . $search_info['path'] . '/' . rawurlencode($querystring));
         }
       }
       // if search is not enabled, break and do nothing
@@ -568,11 +569,14 @@ function apachesolr_failure($search_name, $querystring) {
  * Like $site_key in _update_refresh() - returns a site-specific hash.
  */
 function apachesolr_site_hash() {
-  if (!($hash = variable_get('apachesolr_site_hash', FALSE))) {
+  $config = config('apachesolr.settings');
+  $hash = $config->get('apachesolr_site_hash');
+  if (empty($config->get('apachesolr_site_hash'))) {
     global $base_url;
     // Set a random 6 digit base-36 number as the hash.
     $hash = substr(base_convert(sha1(uniqid($base_url, TRUE)), 16, 36), 0, 6);
-    variable_set('apachesolr_site_hash', $hash);
+    $config->set('apachesolr_site_hash', $hash);
+    $config->save();
   }
   return $hash;
 }
@@ -855,7 +859,7 @@ function apachesolr_clear_cache($env_id) {
   }
   catch (Exception $e) {
     apachesolr_log_exception($env_id, $e);
-    drupal_set_message(nl2br(check_plain($e->getMessage())), 'warning');
+    backdrop_set_message(nl2br(check_plain($e->getMessage())), 'warning');
   }
 }
 
@@ -870,7 +874,7 @@ function apachesolr_set_stats_message($text, $type = 'status', $repeat = FALSE) 
   try {
     $solr = apachesolr_get_solr($env_id);
     $stats_summary = $solr->getStatsSummary();
-    drupal_set_message(check_plain(t($text, $stats_summary)), $type, FALSE);
+    backdrop_set_message(check_plain(t($text, $stats_summary)), $type, FALSE);
   }
   catch (Exception $e) {
     apachesolr_log_exception($env_id, $e);
@@ -938,6 +942,7 @@ function apachesolr_get_last_index_updated($env_id) {
  * Runs the indexing process on all writable environments or just a given environment.
  */
 function apachesolr_cron($env_id = NULL) {
+  $config = config('apachesolr.settings');
   $environments = array();
   if (empty($env_id)) {
     $environments = array_keys(apachesolr_load_all_environments());
@@ -949,9 +954,9 @@ function apachesolr_cron($env_id = NULL) {
   module_load_include('inc', 'apachesolr', 'apachesolr.index');
 
   // Optimize the index (by default once a day).
-  $optimize_interval = variable_get('apachesolr_optimize_interval', 60 * 60 * 24);
+  $optimize_interval = $config->get('apachesolr_optimize_interval');
   // Protect from too-frequent optimizations.
-  $optimize_attempt_interval = variable_get('apachesolr_optimize_attempt_interval', 60 * 60);
+  $optimize_attempt_interval = $config->get('apachesolr_optimize_attempt_interval');
 
   foreach($environments as $env_id) {
 
@@ -1006,7 +1011,7 @@ function apachesolr_cron($env_id = NULL) {
         // Re-populate the luke cache.
         $solr->getLuke();
         // TODO: an admin interface for setting this.  Assume for now 5 minutes.
-        if ($time - $updated >= variable_get('apachesolr_cache_delay', 300)) {
+        if ($time - $updated >= $config->get('apachesolr_cache_delay')) {
           // Clear the updated flag.
           apachesolr_set_last_index_updated($env_id);
         }
@@ -1018,7 +1023,7 @@ function apachesolr_cron($env_id = NULL) {
 
     // We can safely process the apachesolr_cron_limit nodes at a time without a
     // timeout or out of memory error.
-    $limit = variable_get('apachesolr_cron_limit', 50);
+    $limit = $config->get('apachesolr_cron_limit');
     apachesolr_index_entities($env_id, $limit);
   }
 }
@@ -1063,10 +1068,10 @@ function apachesolr_set_facetapi_breadcrumb(FacetapiAdapter $adapter, array $rea
     // Hack here that depnds on our construction of the searcher name in this way.
     list(, $env_id) = explode('@', $adapter->getSearcher());
     // Appends additional breadcrumb items.
-    $breadcrumb = drupal_get_breadcrumb();
+    $breadcrumb = backdrop_get_breadcrumb();
     $breadcrumb[] = l(t('Apache Solr search environment edit'), 'admin/config/search/apachesolr/settings/' . $env_id);
     $breadcrumb[] = l($realm['label'], 'admin/config/search/apachesolr/settings/' . $env_id . '/facets/' . $realm['name']);
-    drupal_set_breadcrumb($breadcrumb);
+    backdrop_set_breadcrumb($breadcrumb);
   }
 }
 
@@ -1096,7 +1101,7 @@ function apachesolr_form_facetapi_facet_dependencies_form_alter(&$form, $form_st
  *   FALSE otherwise.
  */
 function apachesolr_has_searched($env_id, $searched = NULL) {
-  $_searched  = &drupal_static(__FUNCTION__, FALSE);
+  $_searched  = &backdrop_static(__FUNCTION__, FALSE);
   if (is_bool($searched)) {
     $_searched[$env_id] = $searched;
   }
@@ -1119,7 +1124,7 @@ function apachesolr_has_searched($env_id, $searched = NULL) {
  *   FALSE otherwise.
  */
 function apachesolr_suppress_blocks($env_id, $suppress = NULL) {
-  $_suppress = &drupal_static(__FUNCTION__, FALSE);
+  $_suppress = &backdrop_static(__FUNCTION__, FALSE);
   if (is_bool($suppress)) {
     $_suppress[$env_id] = $suppress;
   }
@@ -1134,13 +1139,14 @@ function apachesolr_suppress_blocks($env_id, $suppress = NULL) {
  * Get or set the default environment ID for the current page.
  */
 function apachesolr_default_environment($env_id = NULL) {
-  $default_env_id = &drupal_static(__FUNCTION__, NULL);
+  $config = config('apachesolr.settings');
+  $default_env_id = &backdrop_static(__FUNCTION__, NULL);
 
   if (isset($env_id)) {
     $default_env_id = $env_id;
   }
   if (empty($default_env_id)) {
-    $default_env_id = variable_get('apachesolr_default_environment', 'solr');
+    $default_env_id = $config->get('apachesolr_default_environment');
   }
   return $default_env_id;
 }
@@ -1149,8 +1155,9 @@ function apachesolr_default_environment($env_id = NULL) {
  * Set the default environment and let other modules know about the change.
  */
 function apachesolr_set_default_environment($env_id) {
-  $old_env_id = variable_get('apachesolr_default_environment', 'solr');
-  variable_set('apachesolr_default_environment', $env_id);
+  $config = config('apachesolr.settings');
+  $old_env_id = $config->get('apachesolr_default_environment');
+  $config->set('apachesolr_default_environment', $env_id);
   module_invoke_all('apachesolr_default_environment', $env_id, $old_env_id);
 }
 
@@ -1174,7 +1181,8 @@ function apachesolr_set_default_environment($env_id) {
  * @throws Exception
  */
 function apachesolr_get_solr($env_id = NULL) {
-  $solr_cache = &drupal_static(__FUNCTION__);
+  $config = config('apachesolr.settings');
+  $solr_cache = &backdrop_static(__FUNCTION__);
   $environments = apachesolr_load_all_environments();
 
   if (!interface_exists('DrupalApacheSolrServiceInterface')) {
@@ -1194,7 +1202,7 @@ function apachesolr_get_solr($env_id = NULL) {
     if (empty($solr_cache[$env_id])) {
       // Use the default class if none is specified.
       if (empty($class)) {
-        $class = variable_get('apachesolr_service_class', 'DrupalApacheSolrService');
+        $class = $config->get('apachesolr_service_class');
       }
       // Takes advantage of auto-loading.
       $solr = new $class($environments[$env_id]['url'], $env_id);
@@ -1218,14 +1226,15 @@ function apachesolr_get_solr($env_id = NULL) {
  *   The environments in the database
  */
 function apachesolr_load_all_environments() {
-  $environments = &drupal_static(__FUNCTION__);
+  $config = config('apachesolr.settings');
+  $environments = &backdrop_static(__FUNCTION__);
 
   if (isset($environments)) {
     return $environments;
   }
   // Use cache_get to avoid DB when using memcache, etc.
   $cache = cache_get('apachesolr:environments', 'cache_apachesolr');
-  if (isset($cache->data)) {
+  if (!empty($cache->data)) {
     $environments = $cache->data;
   }
   elseif (!db_table_exists('apachesolr_index_bundles') || !db_table_exists('apachesolr_environment')) {
@@ -1234,18 +1243,7 @@ function apachesolr_load_all_environments() {
     $environments = array();
   }
   else {
-    // If ctools is available use its crud functions to load the environments.
-    if (module_exists('ctools')) {
-      ctools_include('export');
-      $environments = ctools_export_load_object('apachesolr_environment', 'all');
-      // Convert environments to array.
-      foreach ($environments as &$environment) {
-        $environment = (array) $environment;
-      }
-    }
-    else {
       $environments = db_query('SELECT * FROM {apachesolr_environment}')->fetchAllAssoc('env_id', PDO::FETCH_ASSOC);
-    }
 
     // Load conf and index bundles. We don't use 'subrecords callback' property
     // of ctools export API.
@@ -1255,9 +1253,9 @@ function apachesolr_load_all_environments() {
   }
 
   // Allow overrides of environments from settings.php
-  $conf_environments = variable_get('apachesolr_environments', array());
+  $conf_environments = $config->get('apachesolr_environments');
   if (!empty($conf_environments)) {
-    $environments = drupal_array_merge_deep($environments, $conf_environments);
+    $environments = backdrop_array_merge_deep($environments, $conf_environments);
   }
 
   return $environments;
@@ -1367,7 +1365,7 @@ function apachesolr_environment_save($environment) {
   // environment and merge its' data with the new one.
   $old_environment = apachesolr_environment_load($environment['env_id']);
   if (!empty($old_environment['in_code_only']) && $environment != $old_environment) {
-    $environment = drupal_array_merge_deep($old_environment, $environment);
+    $environment = backdrop_array_merge_deep($old_environment, $environment);
   }
 
   $conf = isset($environment['conf']) ? $environment['conf'] : array();
@@ -1401,11 +1399,11 @@ function apachesolr_environment_save($environment) {
  */
 function apachesolr_environments_clear_cache() {
   cache_clear_all('apachesolr:environments', 'cache_apachesolr');
-  drupal_static_reset('apachesolr_load_all_environments');
-  drupal_static_reset('apachesolr_get_solr');
-  if (module_exists('ctools')) {
-    ctools_include('export');
-    ctools_export_load_object_reset('apachesolr_environment');
+  backdrop_static_reset('apachesolr_load_all_environments');
+  backdrop_static_reset('apachesolr_get_solr');
+  if (module_exists('facetapi')) {
+    apachesolr_wizards();
+    facetapi_export_load_object('apachesolr_environment');
   }
 }
 
@@ -1475,14 +1473,15 @@ function apachesolr_environment_save_to_database($env_id) {
  * @return boolean TRUE if the server can be pinged, FALSE otherwise.
  */
 function apachesolr_server_status($url, $class = NULL) {
-  $status = &drupal_static(__FUNCTION__, array());
+  $config = config('apachesolr.settings');
+  $status = &backdrop_static(__FUNCTION__, array());
 
   if (!interface_exists('DrupalApacheSolrServiceInterface')) {
     require_once(dirname(__FILE__) . '/apachesolr.interface.inc');
   }
 
   if (empty($class)) {
-    $class = variable_get('apachesolr_service_class', 'DrupalApacheSolrService');
+    $class = $config->get('apachesolr_service_class');
   }
 
   $key = $url . '|' . $class;
@@ -1493,7 +1492,7 @@ function apachesolr_server_status($url, $class = NULL) {
       // Takes advantage of auto-loading.
       // @Todo : Do we have to specify the env_id?
       $solr = new $class($url);
-      $ping = @$solr->ping(variable_get('apachesolr_ping_timeout', 4));
+      $ping = @$solr->ping($config->get('apachesolr_ping_timeout'));
     }
     catch (Exception $e) {
       apachesolr_log_exception($url, $e);
@@ -1563,7 +1562,7 @@ function apachesolr_do_query(DrupalSolrQueryInterface $current_query) {
   $query->addParam('start', $query->page * $query->getParam('rows'));
 
   // This hook allows modules to modify the query and params objects.
-  drupal_alter('apachesolr_query', $query);
+  backdrop_alter('apachesolr_query', $query);
 
   if ($query->abort_search) {
     // A module implementing HOOK_apachesolr_query_alter() aborted the search.
@@ -1608,7 +1607,7 @@ function apachesolr_do_query(DrupalSolrQueryInterface $current_query) {
  *   Name of the searcher - e.g. from $query->getSearcher().
  */
 function apachesolr_static_response_cache($searcher, $response = NULL) {
-  $_response = &drupal_static(__FUNCTION__, array());
+  $_response = &backdrop_static(__FUNCTION__, array());
 
   if (is_object($response)) {
     $_response[$searcher] = clone $response;
@@ -1640,13 +1639,11 @@ function apachesolr_static_response_cache($searcher, $response = NULL) {
  * @throws Exception
  */
 function apachesolr_drupal_query($name, array $params = array(), $solrsort = '', $base_path = '', DrupalApacheSolrServiceInterface $solr = NULL, $context = array()) {
+  $config = config('apachesolr.settings');
   if (!interface_exists('DrupalSolrQueryInterface')) {
     require_once(dirname(__FILE__) . '/apachesolr.interface.inc');
   }
-  $class_info = variable_get('apachesolr_query_class', array(
-    'file' => 'Solr_Base_Query',
-    'module' => 'apachesolr',
-    'class' => 'SolrBaseQuery'));
+  $class_info = $config->get('apachesolr_query_class');
   $class = $class_info['class'];
   if (!class_exists($class_info['class']) && isset($class_info['file']) && isset($class_info['module'])) {
     module_load_include('php', $class_info['module'], $class_info['file']);
@@ -1669,14 +1666,12 @@ function apachesolr_drupal_query($name, array $params = array(), $solrsort = '',
  * @throws Exception
  */
 function apachesolr_drupal_subquery($operator = 'OR') {
+  $config = config('apachesolr.settings');
   if (!interface_exists('DrupalSolrQueryInterface')) {
     require_once(dirname(__FILE__) . '/apachesolr.interface.inc');
   }
 
-  $class_info = variable_get('apachesolr_subquery_class', array(
-    'file' => 'Solr_Base_Query',
-    'module' => 'apachesolr',
-    'class' => 'SolrFilterSubQuery'));
+  $class_info = $config->get('apachesolr_subquery_class');
   $class = $class_info['class'];
   if (!class_exists($class_info['class']) && isset($class_info['file']) && isset($class_info['module'])) {
     module_load_include('php', $class_info['module'], $class_info['file']);
@@ -1697,7 +1692,7 @@ function apachesolr_drupal_subquery($operator = 'OR') {
  *   return the $query object if it is available in the drupal_static or null otherwise
  */
 function apachesolr_current_query($env_id, DrupalSolrQueryInterface $query = NULL) {
-  $saved_query = &drupal_static(__FUNCTION__, NULL);
+  $saved_query = &backdrop_static(__FUNCTION__, NULL);
   if (is_object($query)) {
     $saved_query[$env_id] = clone $query;
   }
@@ -1724,6 +1719,7 @@ function apachesolr_current_query($env_id, DrupalSolrQueryInterface $query = NUL
  *   Fieldname as it appears in the solr index
  */
 function apachesolr_index_key($field) {
+  $config = config('apachesolr.settings');
   $index_type = !empty($field['index_type']) ? $field['index_type'] : NULL;
   switch ($index_type) {
     case 'text':
@@ -1808,7 +1804,7 @@ function apachesolr_index_key($field) {
   $sm = !empty($field['multiple']) ? 'm_' : 's_';
 
   // Legacy: Block deltas are limited to 32 chars. Keep it like this for backwards compatibility
-  $apachesolr_field_length_limit = variable_get('apachesolr_field_length_limit', '32');
+  $apachesolr_field_length_limit = $config->get('apachesolr_field_length_limit');
   if ($apachesolr_field_length_limit <= 0) {
     return $type_prefix . $sm . $field['name'];
   }
@@ -1821,7 +1817,7 @@ function apachesolr_index_key($field) {
  * Try to map a schema field name to a human-readable description.
  */
 function apachesolr_field_name_map($field_name) {
-  $map = &drupal_static(__FUNCTION__);
+  $map = &backdrop_static(__FUNCTION__);
 
   if (!isset($map)) {
     $map = array(
@@ -1847,8 +1843,8 @@ function apachesolr_field_name_map($field_name) {
     );
     if (module_exists('taxonomy')) {
       foreach (taxonomy_get_vocabularies() as $vocab) {
-        $map['tm_vid_' . $vocab->vid . '_names'] = t('Taxonomy term names only from the %name vocabulary', array('%name' => $vocab->name));
-        $map['im_vid_' . $vocab->vid] = t('Taxonomy term IDs from the %name vocabulary', array('%name' => $vocab->name));
+        $map['tm_vid_' . $vocab->machine_name . '_names'] = t('Taxonomy term names only from the %name vocabulary', array('%name' => $vocab->name));
+        $map['im_vid_' . $vocab->machine_name] = t('Taxonomy term IDs from the %name vocabulary', array('%name' => $vocab->name));
       }
     }
     foreach (apachesolr_entity_fields('node') as $field_nm => $nodefields) {
@@ -1856,7 +1852,7 @@ function apachesolr_field_name_map($field_name) {
         $map[apachesolr_index_key($field_info)] = t('Field of type @type: %label', array('@type' => $field_info['field']['type'], '%label' => $field_info['display_name']));
       }
     }
-    drupal_alter('apachesolr_field_name_map', $map);
+    backdrop_alter('apachesolr_field_name_map', $map);
   }
   return isset($map[$field_name]) ? $map[$field_name] : $field_name;
 }
@@ -1908,7 +1904,7 @@ function apachesolr_entity_info_alter(&$entity_info) {
   // apachesolr_search implements a new callback for every entity type
   // $default_entity_info['node']['result callback'] = 'apachesolr_search_node_result';
   //Allow implementations of HOOK_apachesolr_entity_info to modify these default indexers
-  drupal_alter('apachesolr_entity_info', $default_entity_info);
+  backdrop_alter('apachesolr_entity_info', $default_entity_info);
 
   // First set defaults so that we don't need to worry about NULL keys.
   foreach (array_keys($entity_info) as $type) {
@@ -2067,7 +2063,7 @@ function apachesolr_get_indexer_table($type) {
 
 /**
  * Implements hook_entity_delete().
- * 
+ *
  * Delete the entity's entry from a fictional table of all entities.
  */
 function apachesolr_entity_delete($entity, $entity_type) {
@@ -2084,7 +2080,7 @@ function apachesolr_entity_delete($entity, $entity_type) {
 
 /**
  * Remove a specific entity from a given Solr environment.
- * 
+ *
  * @param string $env_id
  * @param string $entity_type
  * @param string $entity_id
@@ -2113,7 +2109,7 @@ function apachesolr_remove_entity($env_id, $entity_type, $entity_id) {
  * Returns array containing information about node fields that should be indexed
  */
 function apachesolr_entity_fields($entity_type = 'node') {
-  $fields = &drupal_static(__FUNCTION__, array());
+  $fields = &backdrop_static(__FUNCTION__, array());
 
   if (!isset($fields[$entity_type])) {
     $fields[$entity_type] = array();
@@ -2207,7 +2203,7 @@ function apachesolr_entity_fields($entity_type = 'node') {
  * @see http://drupal.org/node/1825426
  */
 function apachesolr_get_field_mappings($entity_type) {
-  $field_mappings = &drupal_static(__FUNCTION__, array());
+  $field_mappings = &backdrop_static(__FUNCTION__, array());
   if (!isset($field_mappings[$entity_type])) {
 
     $field_mappings[$entity_type] = module_invoke_all('apachesolr_field_mappings');
@@ -2239,7 +2235,7 @@ function apachesolr_get_field_mappings($entity_type) {
     }
 
     // Allow other modules to add or alter the field mappings.
-    drupal_alter('apachesolr_field_mappings', $mappings, $entity_type);
+    backdrop_alter('apachesolr_field_mappings', $mappings, $entity_type);
   }
 
   return $field_mappings[$entity_type];
@@ -2813,7 +2809,7 @@ function apachesolr_l($text, $path, $options = array()) {
   $get = array_diff_key($_GET, array('q' => 1, 'page' => 1, 'solrsort' => 1), $options['query']);
   $options['query'] += $get;
 
-  return '<a href="' . check_url(url($path, $options)) . '"' . drupal_attributes($options['attributes']) . '>' . ($options['html'] ? $text : check_plain(html_entity_decode($text))) . '</a>';
+  return '<a href="' . check_url(url($path, $options)) . '"' . backdrop_attributes($options['attributes']) . '>' . ($options['html'] ? $text : check_plain(html_entity_decode($text))) . '</a>';
 }
 
 function theme_apachesolr_sort_link($vars) {
@@ -2967,7 +2963,7 @@ function apachesolr_environment_conf_equals(array $conf1, array $conf2, $ignore_
  * `apachesolr_index_updated`, and `apachesolr_last_optimize`.
  */
 function apachesolr_environment_conf_state_variables() {
-  $keys = &drupal_static(__FUNCTION__);
+  $keys = &backdrop_static(__FUNCTION__);
   if (!isset($keys)) {
     $_keys = array(
       'apachesolr_index_last',
@@ -3012,6 +3008,22 @@ function apachesolr_ctools_environment_delete($env_id) {
 }
 
 /**
+ * Implements hook_wizards().
+ */
+function apachesolr_wizards() {
+  $plugins = array();
+  $plugins['apachesolr_context_page_condition'] = array(
+    'handler' => array(
+      'path' => backdrop_get_path('module', 'apachesolr') .'/plugins/context',
+      'file' => 'apachesolr_context_page_condition.inc',
+      'class' => 'apachesolr_context_page_condition',
+      'parent' => 'context_condition',
+    ),
+  );
+  return $plugins;
+}
+
+/**
  * Callback for exporting Apache Solr environments as CTools exportables.
  *
  * @param array $environment
@@ -3020,7 +3032,7 @@ function apachesolr_ctools_environment_delete($env_id) {
  *   White space for indentation from CTools.
  */
 function apachesolr_ctools_environment_export($environment, $indent) {
-  ctools_include('export');
+  apachesolr_wizards();
   $environment = (object) $environment;
   // Re-load the enviroment, since in some cases the conf
   // is stripped since it's not in the actual schema.
@@ -3041,7 +3053,7 @@ function apachesolr_ctools_environment_export($environment, $indent) {
 
   $additions_top = array();
   $additions_bottom = array('conf' => $environment->conf, 'index_bundles' => $index_bundles);
-  return ctools_export_object('apachesolr_environment', $environment, $indent, NULL, $additions_top, $additions_bottom);
+  return facetapi_export_object('apachesolr_environment', $environment, $indent, NULL, $additions_top, $additions_bottom);
 }
 
 /**
@@ -3053,7 +3065,7 @@ function apachesolr_ctools_environment_export($environment, $indent) {
 function apachesolr_log_exception($env_id, $exception) {
   // TODO: Should we call watchdog_exception() from here?
   $backtrace = $exception->getTrace();
-  $caller = _drupal_get_last_caller($backtrace);
+  $caller = _backdrop_get_last_caller($backtrace);
   watchdog(
     'Apache Solr',
     'Exception caught for function %function (line %line of %file), Environment @env_id: ' . nl2br(check_plain($exception->getMessage())),
@@ -3064,5 +3076,28 @@ function apachesolr_log_exception($env_id, $exception) {
       '@env_id' => $env_id,
     ),
     WATCHDOG_ERROR
+  );
+}
+
+function apachesolr_config_info() {
+  $prefixes['apachesolr.settings'] = array(
+    'label' => t('apachesolr settings'),
+    'group' => t('Configuration'),
+  );
+  return $prefixes;
+}
+
+function apachesolr_autoload_info() {
+  return array(
+    'DrupalApacheSolrService' => 'Drupal_Apache_Solr_Service.php',
+    'ApacheSolrDocument' => 'Apache_Solr_Document.php',
+    'SolrBaseQuery' => 'Solr_Base_Query.php',
+    'SolrFilterSubQuery' => 'Solr_Base_Query.php',
+    'DrupalSolrQueryInterface' => 'apachesolr.interface.inc',
+    'ApacheSolrFacetapiAdapter' => 'plugins/facetapi/adapter.inc',
+    'ApacheSolrFacetapiDate' => 'plugins/facetapi/query_type_date.inc',
+    'ApacheSolrFacetapiGeo' => 'plugins/facetapi/query_type_geo.inc',
+    'ApacheSolrFacetapiNumericRange' => 'plugins/facetapi/query_type_numeric_range.inc',
+    'ApacheSolrFacetapiTerm' => 'plugins/facetapi/query_type_term.inc',
   );
 }

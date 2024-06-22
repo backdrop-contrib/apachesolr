@@ -9,6 +9,7 @@
  * Implements hook_requirements().
  */
 function apachesolr_requirements($phase) {
+  $config = config('apachesolr.settings');
   $requirements = array();
   if ($phase != 'runtime') {
     return $requirements;
@@ -34,7 +35,7 @@ function apachesolr_requirements($phase) {
     $ping = FALSE;
     try {
       $solr = apachesolr_get_solr($id);
-      $ping = @$solr->ping(variable_get('apachesolr_ping_timeout', 4));
+      $ping = @$solr->ping($config->get('apachesolr_ping_timeout'));
       // If there is no $solr object, there is no instance available, so don't continue.
       if (!$ping) {
         throw new Exception(t('No Solr instance available when checking requirements.'));
@@ -63,7 +64,7 @@ function apachesolr_install() {
   module_load_include('inc', 'apachesolr', 'apachesolr_search.admin');
   module_load_include('inc', 'apachesolr', 'apachesolr.index');
   // Create one MLT block.
-  apachesolr_search_mlt_save_block(array('name' => st('More like this')));
+  apachesolr_search_mlt_save_block(array('name' => t('More like this')));
   db_insert('apachesolr_environment')->fields(array('env_id' => 'solr', 'name' => 'localhost server', 'url' => 'http://localhost:8983/solr'))->execute();
 
   // Initialize the entities to index. We enable all node types by default
@@ -72,7 +73,7 @@ function apachesolr_install() {
   $env_id = apachesolr_default_environment();
   apachesolr_index_set_bundles($env_id, 'node', $bundles);
 
-  drupal_set_message(st('Apache Solr is enabled. Visit the <a href="@settings_link">settings page</a>.', array('@settings_link' => url('admin/config/search/apachesolr'))));
+  backdrop_set_message(st('Apache Solr is enabled. Visit the <a href="@settings_link">settings page</a>.', array('@settings_link' => url('admin/config/search/apachesolr'))));
 }
 
 /**
@@ -90,7 +91,7 @@ function apachesolr_enable() {
  */
 function apachesolr_schema() {
 
-  $table = drupal_get_schema_unprocessed('system', 'cache');
+  $table = backdrop_get_schema_unprocessed('system', 'cache');
   $table['description'] = 'Cache table for apachesolr to store Luke data and indexing information.';
   $schema['cache_apachesolr'] = $table;
 
@@ -267,28 +268,28 @@ function apachesolr_schema() {
  */
 function apachesolr_uninstall() {
   // Remove variables.
-  variable_del('apachesolr_default_environment');
-  variable_del('apachesolr_rows');
-  variable_del('apachesolr_site_hash');
-  variable_del('apachesolr_index_last');
-  variable_del('apachesolr_search_mlt_blocks');
-  variable_del('apachesolr_cron_limit');
-  variable_del('apachesolr_exclude_nodeapi_types');
-  variable_del('apachesolr_failure');
-  variable_del('apachesolr_index_updated');
-  variable_del('apachesolr_read_only');
-  variable_del('apachesolr_set_nodeapi_messages');
-  variable_del('apachesolr_last_optimize');
-  variable_del('apachesolr_update_from_6303');
+  config_clear('apachesolr.settings', 'apachesolr_default_environment');
+  config_clear('apachesolr.settings', 'apachesolr_rows');
+  config_clear('apachesolr.settings', 'apachesolr_site_hash');
+  config_clear('apachesolr.settings', 'apachesolr_index_last');
+  config_clear('apachesolr.settings', 'apachesolr_search_mlt_blocks');
+  config_clear('apachesolr.settings', 'apachesolr_cron_limit');
+  config_clear('apachesolr.settings', 'apachesolr_exclude_nodeapi_types');
+  config_clear('apachesolr.settings', 'apachesolr_failure');
+  config_clear('apachesolr.settings', 'apachesolr_index_updated');
+  config_clear('apachesolr.settings', 'apachesolr_read_only');
+  config_clear('apachesolr.settings', 'apachesolr_set_nodeapi_messages');
+  config_clear('apachesolr.settings', 'apachesolr_last_optimize');
+  config_clear('apachesolr.settings', 'apachesolr_update_from_6303');
   // Remove blocks.
-  db_delete('block')->condition('module', 'apachesolr')->execute();
 }
 
 /**
  * Add a table to track Solr servers.
  */
 function apachesolr_update_7000() {
-  if (variable_get('apachesolr_update_from_6303', FALSE)) {
+  $config = config('apachesolr.settings');
+  if ($config->get('apachesolr_update_from_6303')) {
     return NULL;
   }
 
@@ -346,20 +347,20 @@ function apachesolr_update_7000() {
   );
   db_create_table('apachesolr_server', $schema['apachesolr_server']);
   // Insert into the table the current single server record.
-  $host = variable_get('apachesolr_host', 'localhost');
-  $port = variable_get('apachesolr_port', '8983');
-  $path = variable_get('apachesolr_path', '/solr');
+  $host = $config->get('apachesolr_host');
+  $port = $config->get('apachesolr_port');
+  $path =  $config->get('apachesolr_path');
   db_insert('apachesolr_server')->fields(array('server_id' => 'solr', 'name' => 'Apache Solr server', 'host' => $host, 'port' => $port, 'path' => $path))->execute();
-  variable_set('apachesolr_default_server', 'solr');
-  variable_del('apachesolr_host');
-  variable_del('apachesolr_port');
-  variable_del('apachesolr_path');
-  $value = variable_get('apachesolr_service_class', NULL);
+  $config->set('apachesolr_default_server', 'solr');
+  $config->clear('apachesolr_host');
+  $config->clear('apachesolr_port');
+  $config->clear('apachesolr_path');
+  $value = $config->get('apachesolr_service_class');
   if (is_array($value)) {
     list($module, $filepath, $class) = $value;
-    variable_set('apachesolr_service_class', $class);
+    $config->set('apachesolr_service_class', $class);
   }
-  variable_del('apachesolr_logging');
+  $config->clear('apachesolr_logging');
 }
 
 
@@ -367,7 +368,8 @@ function apachesolr_update_7000() {
  * Re-jigger the schema to use fewer, shorter keys.
  */
 function apachesolr_update_7001() {
-  if (variable_get('apachesolr_update_from_6303', FALSE)) {
+  $config = config('apachesolr.settings');
+  if ($config->get('apachesolr_update_from_6303')) {
     return NULL;
   }
 
@@ -391,7 +393,8 @@ function apachesolr_update_7001() {
  * Create the per-server variable table.
  */
 function apachesolr_update_7002() {
-  if (variable_get('apachesolr_update_from_6303', FALSE)) {
+  $config = config('apachesolr.settings');
+  if ($config->get('apachesolr_update_from_6303')) {
     return NULL;
   }
 
@@ -421,16 +424,16 @@ function apachesolr_update_7002() {
     'primary key' => array('server_id', 'name'),
   );
   db_create_table('apachesolr_server_variable', $schema['apachesolr_server_variable']);
-  $server_id = variable_get('apachesolr_default_server', 'solr');
+  $server_id = $config->get('apachesolr_default_server');
   // Variables to be migrated:
-  $conf['apachesolr_enabled_facets'] = variable_get('apachesolr_enabled_facets', NULL);
-  $conf['apachesolr_search_query_fields'] = variable_get('apachesolr_search_query_fields', NULL);
-  $conf['apachesolr_search_type_boosts'] = variable_get('apachesolr_search_type_boosts', NULL);
-  $conf['apachesolr_search_comment_boost'] = variable_get('apachesolr_search_comment_boost', NULL);
-  $conf['apachesolr_search_changed_boost'] = variable_get('apachesolr_search_changed_boost', NULL);
-  $conf['apachesolr_search_sticky_boost'] = variable_get('apachesolr_search_sticky_boost', NULL);
-  $conf['apachesolr_search_promote_boost'] = variable_get('apachesolr_search_promote_boost', NULL);
-  $conf['apachesolr_search_excluded_types'] = variable_get('apachesolr_search_excluded_types', NULL);
+  $conf['apachesolr_enabled_facets'] = $config->get('apachesolr_enabled_facets');
+  $conf['apachesolr_search_query_fields'] = $config->get('apachesolr_search_query_fields');
+  $conf['apachesolr_search_type_boosts'] = $config->get('apachesolr_search_type_boosts');
+  $conf['apachesolr_search_comment_boost'] = $config->get('apachesolr_search_comment_boost');
+  $conf['apachesolr_search_changed_boost'] = $config->get('apachesolr_search_changed_boost');
+  $conf['apachesolr_search_sticky_boost'] = $config->get('apachesolr_search_sticky_boost');
+  $conf['apachesolr_search_promote_boost'] = $config->get('apachesolr_search_promote_boost');
+  $conf['apachesolr_search_excluded_types'] = $config->get('apachesolr_search_excluded_types');
   foreach ($conf as $name => $value) {
     if ($value !== NULL) {
       db_merge('apachesolr_server_variable')
@@ -438,7 +441,7 @@ function apachesolr_update_7002() {
         ->fields(array('value' => serialize($value)))
         ->execute();
     }
-    variable_del($name);
+    $config->clear($name);
   }
 }
 
@@ -446,40 +449,42 @@ function apachesolr_update_7002() {
  * Move excluded comment types into a new variable.
  */
 function apachesolr_update_7003() {
-  if (variable_get('apachesolr_update_from_6303', FALSE)) {
+  $config = config('apachesolr.settings');
+  if ($config->get('apachesolr_update_from_6303')) {
     return NULL;
   }
 
   // Same as apachesolr_update_6006()
-  $exclude_comment_types = variable_get('apachesolr_exclude_comments_types', NULL);
+  $exclude_comment_types = $config->get('apachesolr_exclude_comments_types');
   if (is_array($exclude_comment_types)) {
     $exclude = array();
     foreach ($exclude_comment_types as $type) {
       $exclude[$type]['comment'] = TRUE;
     }
-    variable_set('apachesolr_exclude_nodeapi_types', $exclude);
+    $config->set('apachesolr_exclude_nodeapi_types', $exclude);
   }
-  variable_del('apachesolr_exclude_comments_types');
+  $config->clear('apachesolr_exclude_comments_types');
 }
 
 /**
  * Update apachesolr_failure variable.
  */
 function apachesolr_update_7004() {
-  if (variable_get('apachesolr_update_from_6303', FALSE)) {
+  $config = config('apachesolr.settings');
+  if ($config->get('apachesolr_update_from_6303')) {
     return NULL;
   }
 
-  $failure = variable_get('apachesolr_failure', NULL);
+  $failure = $config->get('apachesolr_failure');
   switch ($failure) {
     case 'show_error':
-      variable_set('apachesolr_failure', 'apachesolr:show_error');
+      $config->set('apachesolr_failure', 'apachesolr:show_error');
       break;
     case 'show_drupal_results':
-      variable_set('apachesolr_failure', 'node');
+      $config->set('apachesolr_failure', 'node');
       break;
     case 'show_no_results':
-      variable_set('apachesolr_failure', 'apachesolr:show_no_results');
+      $config->set('apachesolr_failure', 'apachesolr:show_no_results');
       break;
   }
 }
@@ -488,7 +493,8 @@ function apachesolr_update_7004() {
  * Re-jigger the schema to use just a url column.
  */
 function apachesolr_update_7005() {
-  if (variable_get('apachesolr_update_from_6303', FALSE)) {
+  $config = config('apachesolr.settings');
+  if ($config->get('apachesolr_update_from_6303')) {
     return NULL;
   }
 
@@ -521,21 +527,23 @@ function apachesolr_update_7005() {
  * Remove facet-related variable deprecated by the Facet API integration.
  */
 function apachesolr_update_7006() {
-  if (variable_get('apachesolr_update_from_6303', FALSE)) {
+  $config = config('apachesolr.settings');
+  if ($config->get('apachesolr_update_from_6303')) {
     return NULL;
   }
 
-  variable_del('apachesolr_facetstyle');
-  variable_del('apachesolr_facet_show_children');
-  variable_del('apachesolr_facet_query_limits');
-  variable_del('apachesolr_facet_query_limit_default');
+  $config->clear('apachesolr_facetstyle');
+  $config->clear('apachesolr_facet_show_children');
+  $config->clear('apachesolr_facet_query_limits');
+  $config->clear('apachesolr_facet_query_limit_default');
 }
 
 /**
  * Rename tables to make them more generic.
  */
 function apachesolr_update_7007() {
-  if (variable_get('apachesolr_update_from_6303', FALSE)) {
+  $config = config('apachesolr.settings');
+  if ($config->get('apachesolr_update_from_6303')) {
     return NULL;
   }
 
@@ -557,33 +565,35 @@ function apachesolr_update_7007() {
   );
   db_add_primary_key('apachesolr_environment', array('env_id'));
   db_add_primary_key('apachesolr_environment_variable', array('env_id', 'name'));
-  $id = variable_get('apachesolr_default_server', NULL);
+  $id = $config->get('apachesolr_default_server');
   if (isset($id)) {
-    variable_set('apachesolr_default_environment', $id);
+    $config->set('apachesolr_default_environment', $id);
   }
-  variable_del('apachesolr_default_server');
+  $config->clear('apachesolr_default_server');
 }
 
 /**
  * Remove more facet-related variable deprecated by the Facet API integration.
  */
 function apachesolr_update_7008() {
-  if (variable_get('apachesolr_update_from_6303', FALSE)) {
+  $config = config('apachesolr.settings');
+  if ($config->get('apachesolr_update_from_6303')) {
     return NULL;
   }
 
-  variable_del('apachesolr_facet_missing');
-  variable_del('apachesolr_facet_query_initial_limits');
-  variable_del('apachesolr_facet_query_sorts');
-  variable_del('apachesolr_facet_sort_active');
-  variable_del('apachesolr_operator');
+  $config->clear('apachesolr_facet_missing');
+  $config->clear('apachesolr_facet_query_initial_limits');
+  $config->clear('apachesolr_facet_query_sorts');
+  $config->clear('apachesolr_facet_sort_active');
+  $config->clear('apachesolr_operator');
 }
 
 /**
  * Update Facet API block deltas to account for removal of numeric ID from field names.
  */
 function apachesolr_update_7009() {
-  if (variable_get('apachesolr_update_from_6303', FALSE)) {
+  $config = config('apachesolr.settings');
+  if ($config->get('apachesolr_update_from_6303')) {
     return NULL;
   }
 
@@ -599,11 +609,11 @@ function apachesolr_update_7009() {
           // Generate the old delta
           $facet_name_old = $field['id'] . '_' . $field['field_name'];
           $delta_old = facetapi_build_delta($searcher['name'], $realm['name'], $facet_name_old);
-          $delta_old = substr(drupal_hash_base64($delta_old), 0, 32);
+          $delta_old = substr(backdrop_hash_base64($delta_old), 0, 32);
           // Generate the new delta
           $facet_name = $field['field_name'];
           $delta = facetapi_build_delta($searcher['name'], $realm['name'], $facet_name);
-          $delta = substr(drupal_hash_base64($delta), 0, 32);
+          $delta = substr(backdrop_hash_base64($delta), 0, 32);
           db_update('block')
             ->fields(array('delta' => $delta))
             ->condition('module', 'facetapi')
@@ -619,7 +629,8 @@ function apachesolr_update_7009() {
  * Update cache table schema for Drupal 7.
  */
 function apachesolr_update_7010() {
-  if (variable_get('apachesolr_update_from_6303', FALSE)) {
+  $config = config('apachesolr.settings');
+  if ($config->get('apachesolr_update_from_6303')) {
     return NULL;
   }
 
@@ -631,15 +642,16 @@ function apachesolr_update_7010() {
  * Change the namespace for the indexer from apachesolr_search to apachesolr
  */
 function apachesolr_update_7011() {
-  if (variable_get('apachesolr_update_from_6303', FALSE)) {
+  $config = config('apachesolr.settings');
+  if ($config->get('apachesolr_update_from_6303')) {
     return NULL;
   }
 
-  $stored = variable_get('apachesolr_index_last', array());
+  $stored = $config->get('apachesolr_index_last');
   if (isset($stored['apachesolr_search'])) {
     $stored['apachesolr'] = $stored['apachesolr_search'];
     unset($stored['apachesolr_search']);
-    variable_set('apachesolr_index_last', $stored);
+    $config->set('apachesolr_index_last', $stored);
   }
   return 'Updated the namespace variable for the index process.';
 }
@@ -648,7 +660,8 @@ function apachesolr_update_7011() {
  * Rename some variables and update the database tables
  */
 function apachesolr_update_7012() {
-  if (variable_get('apachesolr_update_from_6303', FALSE)) {
+  $config = config('apachesolr.settings');
+  if ($config->get('apachesolr_update_from_6303')) {
     return NULL;
   }
 
@@ -660,16 +673,16 @@ function apachesolr_update_7012() {
   $env_id = apachesolr_default_environment();
 
   // Variable changed from integer to array with environment integers
-  $stored = variable_get('apachesolr_index_last', array());
+  $stored = $config->get('apachesolr_index_last');
   if (isset($stored['apachesolr'])) {
     $stored[$env_id]['node']['last_entity_id'] = $stored['apachesolr']['last_nid'];
     $stored[$env_id]['node']['last_changed'] = $stored['apachesolr']['last_change'];
     unset($stored['apachesolr']);
-    variable_set('apachesolr_index_last', $stored);
+    $config->set('apachesolr_index_last', $stored);
   }
-  $last = variable_get('apachesolr_index_updated', NULL);
+  $last = $config->get('apachesolr_index_updated');
   if (isset($last)) {
-    variable_set('apachesolr_index_updated', array($env_id => (int) $last));
+    $config->set('apachesolr_index_updated', array($env_id => (int) $last));
   }
 
   // Change namespace to environment id
@@ -822,7 +835,8 @@ function apachesolr_update_7012() {
  * Make consistent (and reduce) field lengths which cause excess pkey length.
  */
 function apachesolr_update_7013() {
-  if (variable_get('apachesolr_update_from_6303', FALSE)) {
+  $config = config('apachesolr.settings');
+  if ($config->get('apachesolr_update_from_6303')) {
     return NULL;
   }
 
@@ -860,7 +874,8 @@ function apachesolr_update_7013() {
  * Remove status from the key.
  */
 function apachesolr_update_7014() {
-  if (variable_get('apachesolr_update_from_6303', FALSE)) {
+  $config = config('apachesolr.settings');
+  if ($config->get('apachesolr_update_from_6303')) {
     return NULL;
   }
 
@@ -879,7 +894,8 @@ function apachesolr_update_7014() {
  * Fix primary key schema mismatch for those who cleanly installed with beta16.
  */
 function apachesolr_update_7015() {
-  if (variable_get('apachesolr_update_from_6303', FALSE)) {
+  $config = config('apachesolr.settings');
+  if ($config->get('apachesolr_update_from_6303')) {
     return NULL;
   }
 
@@ -895,26 +911,28 @@ function apachesolr_update_7015() {
  * with 6.x-3.x.
  */
 function apachesolr_update_7016() {
-  variable_del('apachesolr_update_from_6303');
+  $config = config('apachesolr.settings');
+  $config->clear('apachesolr_update_from_6303');
 }
 
 /**
  * Turn global variables in environment specific ones.
  */
 function apachesolr_update_7017() {
+  $config = config('apachesolr.settings');
   // @see: drupal_load()
   if (!function_exists('apachesolr_environment_variable_set')) {
     include_once dirname(__FILE__) . '/apachesolr.module';
   }
 
-  $stored = variable_get('apachesolr_index_last', array());
+  $stored = $config->get('apachesolr_index_last');
   foreach ($stored as $env_id => $entity_info) {
     apachesolr_environment_variable_set($env_id, 'apachesolr_index_last', $entity_info);
   }
-  variable_del('apachesolr_index_last');
+  $config->clear('apachesolr_index_last');
 
-  $updated = variable_get('apachesolr_index_updated', array());
-  $optimized = variable_get('apachesolr_last_optimize', 0);
+  $updated = $config->get('apachesolr_index_updated');
+  $optimized = $config->get('apachesolr_last_optimize');
   foreach ($updated as $env_id => $timestamp) {
     apachesolr_environment_variable_set($env_id, 'apachesolr_index_updated', $timestamp);
     apachesolr_environment_variable_set($env_id, 'apachesolr_last_optimize', $optimized);
@@ -940,4 +958,144 @@ function apachesolr_update_7018() {
         'apachesolr_last_optimize_attempt', $value);
     }
   }
+}
+
+/**
+ * Implements hook_update_last_removed().
+ */
+function apachesolr_update_last_removed() {
+  return 7018;
+}
+
+/**
+ * Migrate apachesolr variables to config.
+ */
+function apachesolr_update_1000() {
+  $config = config('apachesolr.settings');
+  $config->set('apachesolr_set_nodeapi_messages', update_variable_get('apachesolr_set_nodeapi_messages', 1));
+  $config->set('apachesolr_cron_limit', update_variable_get('apachesolr_cron_limit', 50));
+  $config->set('apachesolr_failure', update_variable_get('apachesolr_failure', 'apachesolr:show_error'));
+  $config->set('apachesolr_watchdog_successes', update_variable_get('apachesolr_watchdog_successes', TRUE));
+  $config->set('apachesolr_luke_limit', update_variable_get('apachesolr_luke_limit', 20000));
+  $config->set('apachesolr_ping_timeout', update_variable_get('apachesolr_ping_timeout', 4));
+  $config->set('apachesolr_index_user', update_variable_get('apachesolr_index_user', 0));
+  $config->set('apachesolr_tags_to_index', update_variable_get('apachesolr_tags_to_index', null));
+  $config->set('apachesolr_exclude_nodeapi_types', update_variable_get('apachesolr_exclude_nodeapi_types', array()));
+  $config->set('apachesolr_cron_mass_limit', update_variable_get('apachesolr_cron_mass_limit', 500));
+  $config->set('apachesolr_report_readonly_to_watchdog', update_variable_get('apachesolr_report_readonly_to_watchdog', TRUE));
+  $config->set('apachesolr_update_from_6303', update_variable_get('apachesolr_update_from_6303', false));
+  $config->set('apachesolr_host', update_variable_get('apachesolr_host', 'localhost'));
+  $config->set('apachesolr_port', update_variable_get('apachesolr_port', '8983'));
+  $config->set('apachesolr_path', update_variable_get('apachesolr_path', '/solr'));
+  $config->set('apachesolr_service_class', update_variable_get('apachesolr_service_class', 'DrupalApacheSolrService'));
+  $config->set('apachesolr_default_server', update_variable_get('apachesolr_default_server', 'solr'));
+  $config->set('apachesolr_enabled_facets', update_variable_get('apachesolr_enabled_facets', NULL));
+  $config->set('apachesolr_search_query_fields', update_variable_get('apachesolr_search_query_fields', NULL));
+  $config->set('apachesolr_search_type_boosts', update_variable_get('apachesolr_search_type_boosts', NULL));
+  $config->set('apachesolr_search_comment_boost', update_variable_get('apachesolr_search_comment_boost', NULL));
+  $config->set('apachesolr_search_changed_boost', update_variable_get('apachesolr_search_changed_boost', NULL));
+  $config->set('apachesolr_search_sticky_boost', update_variable_get('apachesolr_search_sticky_boost', NULL));
+  $config->set('apachesolr_search_promote_boost', update_variable_get('apachesolr_search_promote_boost', NULL));
+  $config->set('apachesolr_search_excluded_types', update_variable_get('apachesolr_search_excluded_types', NULL));
+  $config->set('apachesolr_exclude_comments_types', update_variable_get('apachesolr_exclude_comments_types', NULL));
+  $config->set('apachesolr_index_last', update_variable_get('apachesolr_index_last', array()));
+  $config->set('apachesolr_index_updated', update_variable_get('apachesolr_index_updated', array()));
+  $config->set('apachesolr_last_optimize', update_variable_get('apachesolr_last_optimize', 0));
+  $config->set('apachesolr_site_hash', update_variable_get('apachesolr_site_hash', ""));
+  $config->set('apachesolr_optimize_interval', update_variable_get('apachesolr_optimize_interval', 86400));
+  $config->set('apachesolr_optimize_attempt_interval', update_variable_get('apachesolr_optimize_attempt_interval', 3600));
+  $config->set('apachesolr_cache_delay', update_variable_get('apachesolr_cache_delay', 300));
+  $config->set('apachesolr_default_environment', update_variable_get('apachesolr_default_environment', 'solr'));
+  $config->set('apachesolr_environments', update_variable_get('apachesolr_environments', array()));
+  $config->set('apachesolr_query_class', update_variable_get('apachesolr_query_class', array( 'file' => 'Solr_Base_Query', 'module' => 'apachesolr', 'class' => 'SolrBaseQuery')));
+  $config->set('apachesolr_subquery_class', update_variable_get('apachesolr_subquery_class', array( 'file' => 'Solr_Base_Query', 'module' => 'apachesolr', 'class' => 'SolrFilterSubQuery')));
+  $config->set('apachesolr_field_length_limit', update_variable_get('apachesolr_field_length_limit', 32));
+  $config->set('apachesolr_search_mlt_blocks', update_variable_get('apachesolr_search_mlt_blocks', array()));
+  $config->set('apachesolr_search_taxonomy_links', update_variable_get('apachesolr_search_taxonomy_links', 0));
+  $config->set('apachesolr_search_make_default', update_variable_get('apachesolr_search_make_default', 0));
+  $config->set('apachesolr_rows', update_variable_get('apachesolr_rows', 10));
+  $config->set('apachesolr_search_browse', update_variable_get('apachesolr_search_browse', 'browse'));
+  $config->set('apachesolr_search_spellcheck', update_variable_get('apachesolr_search_spellcheck', TRUE));
+  $config->set('apachesolr_search_default_search_page', update_variable_get('apachesolr_search_default_search_page', 'core_search'));
+  $config->set('apachesolr_search_conditions_callback', update_variable_get('apachesolr_search_conditions_callback', 'apachesolr_search_conditions'));
+  $config->set('apachesolr_hl_active', update_variable_get('apachesolr_hl_active', NULL));
+  $config->set('apachesolr_hl_textsnippetlength', update_variable_get('apachesolr_hl_textsnippetlength', NULL));
+  $config->set('apachesolr_hl_pretag', update_variable_get('apachesolr_hl_pretag', NULL));
+  $config->set('apachesolr_hl_posttag', update_variable_get('apachesolr_hl_posttag', NULL));
+  $config->set('apachesolr_hl_numsnippets', update_variable_get('apachesolr_hl_numsnippets', NULL));
+  $config->set('apachesolr_hl_fieldtohighlight', update_variable_get('apachesolr_hl_fieldtohighlight', NULL));
+  $config->set('apachesolr_facetstyle', update_variable_get('apachesolr_facetstyle', NULL));
+  $config->set('apachesolr_facet_show_children', update_variable_get('apachesolr_facet_show_children', NULL));
+  $config->set('apachesolr_facet_query_limits', update_variable_get('apachesolr_facet_query_limits', NULL));
+  $config->set('apachesolr_facet_query_limit_default', update_variable_get('apachesolr_facet_query_limit_default', NULL));
+  $config->set('apachesolr_facet_missing', update_variable_get('apachesolr_facet_missing', NULL));
+  $config->set('apachesolr_facet_query_initial_limits', update_variable_get('apachesolr_facet_query_initial_limits', NULL));
+  $config->set('apachesolr_facet_query_sorts', update_variable_get('apachesolr_facet_query_sorts', NULL));
+  $config->set('apachesolr_facet_sort_active', update_variable_get('apachesolr_facet_sort_active', NULL));
+  $config->set('apachesolr_operator', update_variable_get('apachesolr_operator', NULL));
+  $config->set('apachesolr_logging', update_variable_get('apachesolr_logging', NULL));
+  $config->save();
+
+  update_variable_del('apachesolr_set_nodeapi_messages');
+  update_variable_del('apachesolr_cron_limit');
+  update_variable_del('apachesolr_failure');
+  update_variable_del('apachesolr_watchdog_successes');
+  update_variable_del('apachesolr_luke_limit');
+  update_variable_del('apachesolr_ping_timeout');
+  update_variable_del('apachesolr_index_user');
+  update_variable_del('apachesolr_tags_to_index');
+  update_variable_del('apachesolr_exclude_nodeapi_types');
+  update_variable_del('apachesolr_cron_mass_limit');
+  update_variable_del('apachesolr_report_readonly_to_watchdog');
+  update_variable_del('apachesolr_update_from_6303');
+  update_variable_del('apachesolr_host');
+  update_variable_del('apachesolr_port');
+  update_variable_del('apachesolr_path');
+  update_variable_del('apachesolr_service_class');
+  update_variable_del('apachesolr_default_server');
+  update_variable_del('apachesolr_enabled_facets');
+  update_variable_del('apachesolr_search_query_fields');
+  update_variable_del('apachesolr_search_type_boosts');
+  update_variable_del('apachesolr_search_comment_boost');
+  update_variable_del('apachesolr_search_changed_boost');
+  update_variable_del('apachesolr_search_sticky_boost');
+  update_variable_del('apachesolr_search_promote_boost');
+  update_variable_del('apachesolr_search_excluded_types');
+  update_variable_del('apachesolr_exclude_comments_types');
+  update_variable_del('apachesolr_index_last');
+  update_variable_del('apachesolr_index_updated');
+  update_variable_del('apachesolr_last_optimize');
+  update_variable_del('apachesolr_site_hash');
+  update_variable_del('apachesolr_optimize_interval');
+  update_variable_del('apachesolr_optimize_attempt_interval');
+  update_variable_del('apachesolr_cache_delay');
+  update_variable_del('apachesolr_default_environment');
+  update_variable_del('apachesolr_environments');
+  update_variable_del('apachesolr_query_class');
+  update_variable_del('apachesolr_subquery_class');
+  update_variable_del('apachesolr_field_length_limit');
+  update_variable_del('apachesolr_search_mlt_blocks');
+  update_variable_del('apachesolr_search_taxonomy_links');
+  update_variable_del('apachesolr_search_make_default');
+  update_variable_del('apachesolr_rows');
+  update_variable_del('apachesolr_search_browse');
+  update_variable_del('apachesolr_search_spellcheck');
+  update_variable_del('apachesolr_search_default_search_page');
+  update_variable_del('apachesolr_search_conditions_callback');
+  update_variable_del('apachesolr_hl_active');
+  update_variable_del('apachesolr_hl_textsnippetlength');
+  update_variable_del('apachesolr_hl_pretag');
+  update_variable_del('apachesolr_hl_posttag');
+  update_variable_del('apachesolr_hl_numsnippets');
+  update_variable_del('apachesolr_hl_fieldtohighlight');
+  update_variable_del('apachesolr_facetstyle');
+  update_variable_del('apachesolr_facet_show_children');
+  update_variable_del('apachesolr_facet_query_limits');
+  update_variable_del('apachesolr_facet_query_limit_default');
+  update_variable_del('apachesolr_facet_missing');
+  update_variable_del('apachesolr_facet_query_initial_limits');
+  update_variable_del('apachesolr_facet_query_sorts');
+  update_variable_del('apachesolr_facet_sort_active');
+  update_variable_del('apachesolr_operator');
+  update_variable_del('apachesolr_logging');
 }

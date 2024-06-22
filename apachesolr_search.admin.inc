@@ -49,6 +49,7 @@ function apachesolr_search_page_list_all() {
  * @return array $build
  */
 function apachesolr_search_page_list_pages() {
+  $config = config('apachesolr.settings');
   $build = array();
   $rows = array();
   $rows['core_search'] = array();
@@ -84,7 +85,7 @@ function apachesolr_search_page_list_pages() {
     );
 
     // Add the search environment
-    $env_id = $search_page['env_id'] == -1 ? variable_get('apachesolr_default_environment', '') : $search_page['env_id'];
+    $env_id = $search_page['env_id'] == -1 ? $config->get('apachesolr_default_environment') : $search_page['env_id'];
     $environment = apachesolr_environment_load($env_id);
 
     $row[] = $environment ? check_plain($environment['name']).($search_page['env_id'] == -1 ? ' - '.t('Default') : '') : check_plain(t('<Disabled>'));
@@ -130,6 +131,8 @@ function apachesolr_search_page_list_pages() {
  * @return array $build
  */
 function apachesolr_search_page_list_blocks() {
+  $config = config('apachesolr.settings');
+  $config->get('apachesolr_search_mlt_blocks');
   $build = array();
   $rows = array();
 
@@ -140,7 +143,8 @@ function apachesolr_search_page_list_blocks() {
     'operations' => array('data' => t('Operations')),
   );
 
-  $search_blocks = variable_get('apachesolr_search_mlt_blocks', array());
+  $search_blocks = $config->get('apachesolr_search_mlt_blocks');
+
   foreach ($search_blocks as $search_block_id => $search_block) {
     $row = array();
 
@@ -153,7 +157,7 @@ function apachesolr_search_page_list_blocks() {
     $row[] = $environment ? check_plain($environment['name']) : check_plain(t('<Disabled>'));
     // Operations
     if (module_exists('block')) {
-      $row[] = array('data' => l(t('Configure'), 'admin/structure/block/manage/apachesolr_search/' . $search_block_id . '/configure', array('query' => array('destination' => current_path()))));
+      $row[] = array('data' => l(t('Configure'), 'admin/config/search/apachesolr/search-pages/block/'. $search_block_id .'/edit', array('query' => array('destination' => current_path()))));
     }
     $row[] = array('data' => l(t('Delete'), 'admin/config/search/apachesolr/search-pages/block/' . $search_block_id . '/delete'));
     $rows[$search_block_id] = $row;
@@ -182,9 +186,10 @@ function apachesolr_search_page_list_blocks() {
  * Menu callback/form-builder for the form to create or edit a search page.
  */
 function apachesolr_search_page_settings_form($form, &$form_state, $search_page = NULL) {
+  $config = config('apachesolr.settings');
   $environments = apachesolr_load_all_environments();
   $options = array('' => t('<Disabled>'));
-  if(variable_get('apachesolr_default_environment', false)){
+  if($config->get('apachesolr_default_environment')){
     $options[-1] = t('<Default>');
   }
   foreach ($environments as $id => $environment) {
@@ -490,6 +495,7 @@ function apachesolr_search_page_settings_form_validate($form, &$form_state) {
  * Processes apachesolr_search_page_settings_form form submissions.
  */
 function apachesolr_search_page_settings_form_submit($form, &$form_state) {
+  $config = config('apachesolr.settings');
   $settings = array();
   $settings['fq'] = array();
   if ($form_state['values']['filters']) {
@@ -508,7 +514,7 @@ function apachesolr_search_page_settings_form_submit($form, &$form_state) {
 
   // Set the default search page settings
   if (!empty($form_state['values']['make_default']) && isset($form_state['values']['page_id'])) {
-    variable_set('apachesolr_search_default_search_page', $form_state['values']['page_id']);
+    $config->set('apachesolr_search_default_search_page', $form_state['values']['page_id']);
   }
 
   $search_page = array();
@@ -523,11 +529,11 @@ function apachesolr_search_page_settings_form_submit($form, &$form_state) {
 
   // Menu rebuild needed to pick up search path.
   if ($form_state['values']['search_page']['search_path'] != $search_page['search_path']) {
-    variable_set('menu_rebuild_needed', TRUE);
+    $config->set('menu_rebuild_needed', TRUE);
   }
 
   // Saves our values in the database, sets redirect path on success.
-  drupal_set_message(t('The configuration options have been saved for %page.', array('%page' => $form_state['values']['label'])));
+  backdrop_set_message(t('The configuration options have been saved for %page.', array('%page' => $form_state['values']['label'])));
   if (isset($form_state['clicked_button']['#redirect'])) {
     $form_state['redirect'] = $form_state['clicked_button']['#redirect'];
   }
@@ -536,8 +542,8 @@ function apachesolr_search_page_settings_form_submit($form, &$form_state) {
   }
   // Regardlessly of the destination parameter we want to go to another page
   unset($_GET['destination']);
-  drupal_static_reset('drupal_get_destination');
-  drupal_get_destination();
+  backdrop_static_reset('backdrop_get_destination');
+  backdrop_get_destination();
 }
 
 /**
@@ -580,7 +586,7 @@ function apachesolr_search_delete_search_page_confirm($form, &$form_state, $sear
   }
   else {
     // Maybe this should be solved somehow else
-    drupal_access_denied();
+    backdrop_access_denied();
   }
 }
 
@@ -595,7 +601,7 @@ function apachesolr_search_delete_search_page_confirm_submit($form, &$form_state
     ->execute();
 
   // Sets message, logs action.
-  drupal_set_message(t(
+  backdrop_set_message(t(
     'The %label search page configuration has been deleted.',
     array('%label' => $form_state['values']['label'])
   ));
@@ -633,7 +639,7 @@ function apachesolr_search_clone_search_page_confirm($form, &$form_state, $searc
  */
 function apachesolr_search_clone_search_page_confirm_submit($form, &$form_state) {
   if (apachesolr_search_page_clone($form_state['values']['page_id'])) {
-    drupal_set_message(t('The search page was cloned'));
+    backdrop_set_message(t('The search page was cloned'));
   }
   $form_state['redirect'] = 'admin/config/search/apachesolr/search-pages';
 }
@@ -656,8 +662,8 @@ function apachesolr_search_get_fields($environment = NULL) {
   }
   catch (Exception $e) {
     apachesolr_log_exception($env_id, $e);
-    drupal_set_message(nl2br(check_plain($e->getMessage())), 'warning');
-    drupal_set_message(t('Cannot get information about the fields in the index.'), 'warning');
+    backdrop_set_message(nl2br(check_plain($e->getMessage())), 'warning');
+    backdrop_set_message(t('Cannot get information about the fields in the index.'), 'warning');
   }
 }
 
@@ -683,7 +689,7 @@ function apachesolr_bias_settings_page($environment = NULL) {
   // Adds content bias and type boost forms.
   $fields = apachesolr_search_get_fields($environment);
   $form = array();
-  $form = drupal_get_form('apachesolr_search_bias_form', $env_id, $fields);
+  $form = backdrop_get_form('apachesolr_search_bias_form', $env_id, $fields);
   $output['bias_forms'] = $form;
   return $output;
 }
@@ -731,7 +737,7 @@ function apachesolr_search_bias_form_submit(&$form, &$form_state) {
       }
     }
   }
-  drupal_set_message(t('The configuration options have been saved.'));
+  backdrop_set_message(t('The configuration options have been saved.'));
 }
 
 function apachesolr_search_bias_form_reset($form, &$form_state) {
@@ -741,7 +747,7 @@ function apachesolr_search_bias_form_reset($form, &$form_state) {
   foreach ($form_state['values'] as $key => $value) {
     apachesolr_environment_variable_del($form['#env_id'], $key);
   }
-  drupal_set_message(t('The configuration options have been reset to their default values.'));
+  backdrop_set_message(t('The configuration options have been reset to their default values.'));
 }
 
 /**
@@ -769,7 +775,7 @@ function apachesolr_search_result_bias_form($env_id) {
     '0:0' => t('Ignore'),
   );
 
-  $weights = drupal_map_assoc(array('21.0', '13.0', '8.0', '5.0', '3.0', '2.0', '1.0', '0.8', '0.5', '0.3', '0.2', '0.1'));
+  $weights = backdrop_map_assoc(array('21.0', '13.0', '8.0', '5.0', '3.0', '2.0', '1.0', '0.8', '0.5', '0.3', '0.2', '0.1'));
   $weights['0'] = t('Ignore');
 
   $form = array();
@@ -839,7 +845,7 @@ function apachesolr_search_field_bias_form($fields, $env_id) {
     'tags_a' => '0',
   );
   $qf = apachesolr_environment_variable_get($env_id, 'field_bias', $defaults);
-  $weights = drupal_map_assoc(array('21.0', '13.0', '8.0', '5.0', '3.0', '2.0', '1.0', '0.8', '0.5', '0.3', '0.2', '0.1'));
+  $weights = backdrop_map_assoc(array('21.0', '13.0', '8.0', '5.0', '3.0', '2.0', '1.0', '0.8', '0.5', '0.3', '0.2', '0.1'));
   $weights['0'] = t('Omit');
   if (!$qf) {
     $qf = $defaults;
@@ -903,7 +909,7 @@ function apachesolr_search_type_boost_form($env_id) {
     '#tree' => TRUE,
   );
 
-  $weights = drupal_map_assoc(array('21.0', '13.0', '8.0', '5.0', '3.0', '2.0', '1.0', '0.8', '0.5', '0.3', '0.2', '0.1'));
+  $weights = backdrop_map_assoc(array('21.0', '13.0', '8.0', '5.0', '3.0', '2.0', '1.0', '0.8', '0.5', '0.3', '0.2', '0.1'));
   $weights['0'] = t('Ignore');
 
   // Get the current boost values.
@@ -946,7 +952,7 @@ function apachesolr_search_mlt_add_block_form() {
 function apachesolr_search_mlt_add_block_form_submit($form, &$form_state) {
   apachesolr_search_mlt_save_block($form_state['values']);
   $block_message = t('New More like this block created. <a href="!configure">Configure</a> this block in the Block administration', array('!configure' => url('admin/structure/block')));
-  drupal_set_message($block_message);
+  backdrop_set_message($block_message);
   $form_state['redirect'] = 'admin/config/search/apachesolr/search-pages';
 }
 
@@ -1012,25 +1018,47 @@ function apachesolr_search_mlt_get_fields() {
  * @param int $delta The id of the block you wish to update.
  */
 function apachesolr_search_mlt_save_block($block_settings = array(), $delta = NULL) {
-  $blocks = variable_get('apachesolr_search_mlt_blocks', array());
+  $config = config('apachesolr.settings');
+  $blocks = $config->get('apachesolr_search_mlt_blocks');
   if (is_null($delta)) {
     $count = 0;
     ksort($blocks);
     // Construct a new array key.
     if (end($blocks)) {
-      list(, $count) = explode('-', key($blocks));
+      [, $count] = explode('-', key($blocks));
     }
     $delta = sprintf('mlt-%03d', 1 + $count);
   }
-  $defaults = apachesolr_search_mlt_block_defaults();
-  // Remove stray form values.
-  $blocks[$delta] = array_intersect_key($block_settings, $defaults) + $defaults;
-  // Eliminate non-selected fields.
-  $blocks[$delta]['mlt_fl'] = array_filter($blocks[$delta]['mlt_fl']);
-  $blocks[$delta]['delta'] = $delta;
-  $blocks[$delta]['mlt_type_filters'] = array_filter($blocks[$delta]['mlt_type_filters']);
-  $blocks[$delta]['mlt_custom_filters'] = trim($blocks[$delta]['mlt_custom_filters']);
-  variable_set('apachesolr_search_mlt_blocks', $blocks);
+  if (!isset($blocks[$delta])){
+    $defaults = apachesolr_search_mlt_block_defaults();
+    // Remove stray form values.
+    $blocks[$delta] = array_intersect_key($block_settings, $defaults) + $defaults;
+    // Eliminate non-selected fields.
+    $blocks[$delta]['mlt_fl'] = array_filter($blocks[$delta]['mlt_fl']);
+    $blocks[$delta]['delta'] = $delta;
+    $blocks[$delta]['mlt_type_filters'] = array_filter($blocks[$delta]['mlt_type_filters']);
+    $blocks[$delta]['mlt_custom_filters'] = trim($blocks[$delta]['mlt_custom_filters']);
+  }
+  else {
+    $block = $blocks[$block_settings['delta']];
+    foreach ($block_settings as $k => $value) {
+      if (isset($block[$k])) {
+        $block[$k] = $value;
+      }
+    }
+    foreach ($block_settings['advanced'] as $i => $rest){
+      if (isset($block[$i])) {
+        $block[$i] = $rest;
+      }
+    }
+    $block['mlt_type_filters']= $block_settings['restrictions']['mlt_type_filters'];
+    $block['mlt_custom_filters']= $block_settings['restrictions']['mlt_custom_filters'];
+
+    $blocks[$block_settings['delta']] = $block;
+  }
+
+  $config->set('apachesolr_search_mlt_blocks', $blocks);
+  $config->save();
 }
 
 function apachesolr_search_mlt_delete_block_form($form, &$form_state, $block) {
@@ -1057,11 +1085,12 @@ function apachesolr_search_mlt_delete_block_form($form, &$form_state, $block) {
 }
 
 function apachesolr_search_mlt_delete_block_form_submit($form, &$form_state) {
+  $config = config('apachesolr.settings');
   $blocks = apachesolr_search_load_all_mlt_blocks();
 
   unset($blocks[$form_state['values']['delta']]);
-  variable_set('apachesolr_search_mlt_blocks', $blocks);
-  drupal_set_message(t('The block has been deleted.'));
+  config_set('apachesolr.settings','apachesolr_search_mlt_blocks', $blocks);
+  backdrop_set_message(t('The block has been deleted.'));
   $form_state['redirect'] = 'admin/config/search/apachesolr/search-pages';
 }
 
@@ -1076,6 +1105,7 @@ function apachesolr_search_mlt_delete_block_form_submit($form, &$form_state) {
  *  based on the node id.
  */
 function apachesolr_search_mlt_block_form($block_id = NULL) {
+  $config = config('apachesolr.settings');
   if (!empty($block_id)) {
     $block = apachesolr_search_mlt_block_load($block_id);
     if (!$block) {
@@ -1117,7 +1147,7 @@ function apachesolr_search_mlt_block_form($block_id = NULL) {
     '#type' => 'select',
     '#title' => t('Maximum number of related items to display'),
     '#default_value' => isset($block['num_results']) ? $block['num_results'] : '',
-    '#options' => drupal_map_assoc(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)),
+    '#options' => backdrop_map_assoc(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)),
     '#weight' => -1,
 
     );
@@ -1136,7 +1166,7 @@ function apachesolr_search_mlt_block_form($block_id = NULL) {
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
   );
-  $options = drupal_map_assoc(array(1, 2, 3, 4, 5, 6, 7));
+  $options = backdrop_map_assoc(array(1, 2, 3, 4, 5, 6, 7));
   $form['advanced']['mlt_mintf'] = array(
     '#type' => 'select',
     '#title' => t('Minimum term frequency'),
@@ -1163,13 +1193,13 @@ function apachesolr_search_mlt_block_form($block_id = NULL) {
     '#title' => t('Maximum word length'),
     '#description' => t('You can use this to eliminate very long words from similarity comparisons. Words of more than this number of characters will be ignored.'),
     '#default_value' => isset($block['mlt_maxwl']) ? $block['mlt_maxwl'] : '',
-    '#options' => drupal_map_assoc(array(8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20)),
+    '#options' => backdrop_map_assoc(array(8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20)),
   );
   $form['advanced']['mlt_maxqt'] = array(
     '#type' => 'select',
     '#title' => t('Maximum number of query terms'),
     '#description' => t('The maximum number of query terms that will be included in any query. Lower numbers will result in fewer recommendations but will get results faster. If a content recommendation is not returning any recommendations, you can either check more "Comparison fields" checkboxes or increase the maximum number of query terms here.'),
-    '#options' => drupal_map_assoc(array(3, 5, 7, 10, 12, 15, 20, 25, 30, 35, 40)),
+    '#options' => backdrop_map_assoc(array(3, 5, 7, 10, 12, 15, 20, 25, 30, 35, 40)),
     '#default_value' => isset($block['mlt_maxqt']) ? $block['mlt_maxqt'] : '',
   );
 
@@ -1211,4 +1241,40 @@ function apachesolr_search_mlt_block_form($block_id = NULL) {
   );
 
   return $form;
+}
+
+function apachesolr_search_mlt_block_edit_form() {
+  $config = config('apachesolr.settings');
+  $block_id = arg(6);
+  $blocks = $config->get('apachesolr_search_mlt_blocks');
+
+  $block = $blocks[$block_id];
+  $form = apachesolr_search_mlt_block_form($block_id);
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#weight' => '100',
+    '#value' => t('Save'),
+  );
+
+  return $form;
+}
+
+function apachesolr_search_mlt_block_edit_form_submit($form, &$form_state) {
+  $array = $form_state['values'];
+  $config = config('apachesolr.settings');
+  $block_id = arg(6);
+  $blocks = $config->get('apachesolr_search_mlt_blocks');
+  $block = $blocks[$block_id];
+
+  foreach ($array as $k=>$value){
+    if (isset($block[$k])){
+      $block[$k] = $value;
+    }
+ }
+  $blocks[$block_id]=$block;
+  config_set('apachesolr.settings','apachesolr_search_mlt_blocks', $blocks);
+
+  backdrop_set_message(t('The configuration options have been saved for Block '.$block['name']));
+  $form_state['redirect'] = 'admin/config/search/apachesolr/search-pages';
 }

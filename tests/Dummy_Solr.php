@@ -310,7 +310,7 @@ class DummySolr implements DrupalApacheSolrServiceInterface {
    *   Any request parameters when constructing the URL.
    *
    * @param array $options
-   *  @see drupal_http_request() $options.
+   *  @see backdrop_http_request() $options.
    *
    * @return
    *  response object
@@ -468,7 +468,7 @@ class DummySolr implements DrupalApacheSolrServiceInterface {
   /**
    * Set context value.
    */
-  function addContext(array $context) { 
+  function addContext(array $context) {
   }
 }
 
