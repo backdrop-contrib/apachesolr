@@ -155,10 +155,10 @@ function hook_apachesolr_field_mappings_alter(array &$mappings, $entity_type) {
  * This is otherwise the same as HOOK_apachesolr_query_alter(), but runs before
  * it.
  *
- * @param DrupalSolrQueryInterface $query
- *  An object implementing DrupalSolrQueryInterface. No need for &.
+ * @param BackdropSolrQueryInterface $query
+ *  An object implementing BackdropSolrQueryInterface. No need for &.
  */
-function hook_apachesolr_query_prepare(DrupalSolrQueryInterface $query) {
+function hook_apachesolr_query_prepare(BackdropSolrQueryInterface $query) {
   // Add a sort on the node ID.
   $query->setAvailableSort('entity_id', array(
     'title' => t('Node ID'),
@@ -185,14 +185,14 @@ function hook_apachesolr_field_name_map_alter(array &$map) {
  * A module implementing HOOK_apachesolr_query_alter() may set
  * $query->abort_search to TRUE to flag the query to be aborted.
  *
- * @param DrupalSolrQueryInterface $query
- *   An object implementing DrupalSolrQueryInterface. No need for &.
+ * @param BackdropSolrQueryInterface $query
+ *   An object implementing BackdropSolrQueryInterface. No need for &.
  *
  * @see /admin/reports/apachesolr
  * - This report displays the active solr index fields and can help you
  *   create Solr filters based on the data currently in your system
  */
-function hook_apachesolr_query_alter(DrupalSolrQueryInterface $query) {
+function hook_apachesolr_query_alter(BackdropSolrQueryInterface $query) {
   // I only want to see articles by the admin.
   //
   // NOTE: this "is_uid" filter does NOT refer to the English word "is"
@@ -226,7 +226,7 @@ function hook_apachesolr_query_alter(DrupalSolrQueryInterface $query) {
  * Allows a module to modify the delete query.
  *
  * @param string $query
- *   This is not an instance of DrupalSolrQueryInterface, it is the raw query
+ *   This is not an instance of BackdropSolrQueryInterface, it is the raw query
  *   that is being sent to Solr. Defaults to "*:*".
  */
 function hook_apachesolr_delete_by_query_alter(&$query) {
@@ -334,9 +334,9 @@ function hook_apachesolr_entity_info_alter(array &$entity_info) {
  * @param ApacheSolrDocument $document
  *   The ApacheSolrDocument instance.
  * @param array $extra
- * @param DrupalSolrQueryInterface $query
+ * @param BackdropSolrQueryInterface $query
  */
-function hook_apachesolr_search_result_alter(ApacheSolrDocument $document, array &$extra, DrupalSolrQueryInterface $query) {
+function hook_apachesolr_search_result_alter(ApacheSolrDocument $document, array &$extra, BackdropSolrQueryInterface $query) {
 }
 
 /**
@@ -345,10 +345,10 @@ function hook_apachesolr_search_result_alter(ApacheSolrDocument $document, array
  *
  * @param array $results
  *   The returned search results.
- * @param DrupalSolrQueryInterface $query
+ * @param BackdropSolrQueryInterface $query
  *   The query for which we want to process the results from
  */
-function hook_apachesolr_process_results(array &$results, DrupalSolrQueryInterface $query) {
+function hook_apachesolr_process_results(array &$results, BackdropSolrQueryInterface $query) {
   foreach ($results as $id => $result) {
     $results[$id]['title'] = t('[Result] !title', array('!title' => $result['title']));
   }

@@ -3,7 +3,7 @@
 /**
  * The interface for all 'query' objects.
  */
-interface DrupalSolrQueryInterface {
+interface BackdropSolrQueryInterface {
 
   /**
    * Get query name.
@@ -68,7 +68,7 @@ interface DrupalSolrQueryInterface {
    * @param string $local
    *   Solr LocalParams.
    *
-   * @return DrupalSolrQueryInterface
+   * @return BackdropSolrQueryInterface
    *   The called object.
    */
   function addFilter($name, $value, $exclude = FALSE, $local = '');
@@ -85,7 +85,7 @@ interface DrupalSolrQueryInterface {
    *   If $value is not NULL, only filters matching both $value and $exclude are
    *   removed. Ignored if $value is NULL.
    *
-   * @return DrupalSolrQueryInterface
+   * @return BackdropSolrQueryInterface
    *   The called object.
    */
   function removeFilter($name, $value = NULL, $exclude = FALSE);
@@ -110,7 +110,7 @@ interface DrupalSolrQueryInterface {
    *   this is unlikely to work with the Dismax handler when the main query is
    *   only keywords.
    *
-   * @return DrupalSolrQueryInterface
+   * @return BackdropSolrQueryInterface
    *   The called object.
    */
   function addFilterSubQuery(SolrFilterSubQuery $query);
@@ -118,10 +118,10 @@ interface DrupalSolrQueryInterface {
   /**
    * Removes a specific subquery.
    *
-   * @param DrupalSolrQueryInterface $query
+   * @param BackdropSolrQueryInterface $query
    *   The query to remove.
    *
-   * @return DrupalSolrQueryInterface
+   * @return BackdropSolrQueryInterface
    *   The called object.
    */
   function removeFilterSubQuery(SolrFilterSubQuery $query);
@@ -129,7 +129,7 @@ interface DrupalSolrQueryInterface {
   /**
    * Removes all subqueries.
    *
-   * @return DrupalSolrQueryInterface
+   * @return BackdropSolrQueryInterface
    *   The called object.
    */
   function removeFilterSubQueries();
@@ -185,7 +185,7 @@ interface DrupalSolrQueryInterface {
    * @param $value
    *   A Solr param value: an array of values, or a string for a single value.
    *
-   * @return DrupalSolrQueryInterface
+   * @return BackdropSolrQueryInterface
    *   The called object.
    */
   function addParam($name, $value);
@@ -199,7 +199,7 @@ interface DrupalSolrQueryInterface {
    *   An array where the keys are param names, and the values may be strings or
    *   arrays of strings.
    *
-   * @return DrupalSolrQueryInterface
+   * @return BackdropSolrQueryInterface
    *   The called object.
    */
   function addParams(array $params);
@@ -210,7 +210,7 @@ interface DrupalSolrQueryInterface {
    * @param string $name
    *   A Solr param name, e.g. 'q' or 'fl'.
    *
-   * @return DrupalSolrQueryInterface
+   * @return BackdropSolrQueryInterface
    *   The called object.
    */
   function removeParam($name);
@@ -225,7 +225,7 @@ interface DrupalSolrQueryInterface {
    * @param $value
    *   A Solr param value: an array of values, or a string for a single value.
    *
-   * @return DrupalSolrQueryInterface
+   * @return BackdropSolrQueryInterface
    *   The called object.
    */
   function replaceParam($name, $value);
@@ -236,7 +236,7 @@ interface DrupalSolrQueryInterface {
    * @param $field_map
    *   An array keyed with real Solr index field names with the alias as value.
    *
-   * @return DrupalSolrQueryInterface
+   * @return BackdropSolrQueryInterface
    *   The called object.
    */
   function addFieldAliases($field_map);
@@ -256,7 +256,7 @@ interface DrupalSolrQueryInterface {
    *  An array with the keys 'title', for the human name of the sort, and
    *  'default', for the default sort direction ('asc' or 'desc').
    *
-   * @return DrupalSolrQueryInterface
+   * @return BackdropSolrQueryInterface
    *   The called object.
    */
   function setAvailableSort($name, $sort);
@@ -267,7 +267,7 @@ interface DrupalSolrQueryInterface {
    * @param string $name
    *  The name of the field in the Solr index to sort on.
    *
-   * @return DrupalSolrQueryInterface
+   * @return BackdropSolrQueryInterface
    *   The called object.
    */
   function removeAvailableSort($name);
@@ -289,7 +289,7 @@ interface DrupalSolrQueryInterface {
    * @param string $direction
    *  'asc' or 'desc'
    *
-   * @return DrupalSolrQueryInterface
+   * @return BackdropSolrQueryInterface
    *   The called object.
    */
   function setSolrsort($name, $direction);
@@ -340,7 +340,7 @@ interface DrupalSolrQueryInterface {
 /**
  * The interface for all 'Service' objects.
  */
-interface DrupalApacheSolrServiceInterface {
+interface BackdropApacheSolrServiceInterface {
   /**
    * Call the /admin/ping servlet, to test the connection to the server.
    *

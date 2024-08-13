@@ -15,7 +15,7 @@
     "apachesolr_host": "localhost",
     "apachesolr_port": "8983",
     "apachesolr_path": "/solr",
-    "apachesolr_service_class": "DrupalApacheSolrService",
+    "apachesolr_service_class": "BackdropApacheSolrService",
     "apachesolr_default_server": "solr",
     "apachesolr_enabled_facets": null,
     "apachesolr_search_query_fields": null,

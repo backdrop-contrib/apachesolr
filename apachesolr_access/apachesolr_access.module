@@ -59,7 +59,7 @@ function apachesolr_access_build_subquery($account) {
   if (!user_access('access content', $account)) {
     throw new Exception('No access');
   }
-  $node_access_query = apachesolr_drupal_subquery();
+  $node_access_query = apachesolr_backdrop_subquery();
   if (user_access('bypass node access', $account)) {
     // Access all content from the current site.
     $node_access_query->addFilter('hash', apachesolr_site_hash());
@@ -88,10 +88,10 @@ function apachesolr_access_build_subquery($account) {
  *
  * Alter the query to include the access subquery
  *
- * @param DrupalSolrQueryInterface $query
+ * @param BackdropSolrQueryInterface $query
  *
  */
-function apachesolr_access_apachesolr_query_alter(DrupalSolrQueryInterface $query) {
+function apachesolr_access_apachesolr_query_alter(BackdropSolrQueryInterface $query) {
   global $user;
   try {
     $subquery = apachesolr_access_build_subquery($user);

@@ -24,7 +24,7 @@ class ApacheSolrFacetapiNumericRange extends FacetapiQueryType implements Faceta
   /**
    * Adds the filter to the query object.
    *
-   * @param DrupalSolrQueryInterface $query
+   * @param BackdropSolrQueryInterface $query
    *   An object containing the query in the backend's native API.
    * @todo Cache the values based on the filter query or any other way?
    */
@@ -71,7 +71,7 @@ class ApacheSolrFacetapiNumericRange extends FacetapiQueryType implements Faceta
       $solr = apachesolr_get_solr();
 
       // We possibly need some caching for this query
-      $query_stats = apachesolr_drupal_query('apachesolr_stats', array(), '', '', $solr);
+      $query_stats = apachesolr_backdrop_query('apachesolr_stats', array(), '', '', $solr);
       $query_stats->addParam('stats', 'true');
       $query_stats->addParam('stats.field', $this->single_key);
       $query_stats->addParam('stats.facet', $this->single_key);

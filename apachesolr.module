@@ -1176,7 +1176,7 @@ function apachesolr_set_default_environment($env_id) {
  *
  * @param string $env_id
  *
- * @return DrupalApacheSolrServiceInterface $solr
+ * @return BackdropApacheSolrServiceInterface $solr
  *
  * @throws Exception
  */
@@ -1185,7 +1185,7 @@ function apachesolr_get_solr($env_id = NULL) {
   $solr_cache = &backdrop_static(__FUNCTION__);
   $environments = apachesolr_load_all_environments();
 
-  if (!interface_exists('DrupalApacheSolrServiceInterface')) {
+  if (!interface_exists('BackdropApacheSolrServiceInterface')) {
     require_once(dirname(__FILE__) . '/apachesolr.interface.inc');
   }
 
@@ -1476,7 +1476,7 @@ function apachesolr_server_status($url, $class = NULL) {
   $config = config('apachesolr.settings');
   $status = &backdrop_static(__FUNCTION__, array());
 
-  if (!interface_exists('DrupalApacheSolrServiceInterface')) {
+  if (!interface_exists('BackdropApacheSolrServiceInterface')) {
     require_once(dirname(__FILE__) . '/apachesolr.interface.inc');
   }
 
@@ -1519,7 +1519,7 @@ function apachesolr_server_status($url, $class = NULL) {
  *
  * @throws Exception
  */
-function apachesolr_do_query(DrupalSolrQueryInterface $current_query) {
+function apachesolr_do_query(BackdropSolrQueryInterface $current_query) {
   if (!is_object($current_query)) {
     throw new Exception(t('NULL query object in function apachesolr_do_query()'));
   }
@@ -1630,17 +1630,17 @@ function apachesolr_static_response_cache($searcher, $response = NULL) {
  *   Visible string telling solr how to sort.
  * @param string $base_path
  *   The search base path (without the keywords) for this query.
- * @param DrupalApacheSolrServiceInterface $solr
- *   An instance of DrupalApacheSolrServiceInterface.
+ * @param BackdropApacheSolrServiceInterface $solr
+ *   An instance of BackdropApacheSolrServiceInterface.
  *
- * @return DrupalSolrQueryInterface
- *   DrupalSolrQueryInterface object.
+ * @return BackdropSolrQueryInterface
+ *   BackdropSolrQueryInterface object.
  *
  * @throws Exception
  */
-function apachesolr_drupal_query($name, array $params = array(), $solrsort = '', $base_path = '', DrupalApacheSolrServiceInterface $solr = NULL, $context = array()) {
+function apachesolr_backdrop_query($name, array $params = array(), $solrsort = '', $base_path = '', BackdropApacheSolrServiceInterface $solr = NULL, $context = array()) {
   $config = config('apachesolr.settings');
-  if (!interface_exists('DrupalSolrQueryInterface')) {
+  if (!interface_exists('BackdropSolrQueryInterface')) {
     require_once(dirname(__FILE__) . '/apachesolr.interface.inc');
   }
   $class_info = $config->get('apachesolr_query_class');
@@ -1660,14 +1660,14 @@ function apachesolr_drupal_query($name, array $params = array(), $solrsort = '',
  * @param $operator
  *   Whether the subquery should be added to another query as OR or AND
  *
- * @return DrupalSolrQueryInterface|false
+ * @return BackdropSolrQueryInterface|false
  *   Subquery or error.
  *
  * @throws Exception
  */
-function apachesolr_drupal_subquery($operator = 'OR') {
+function apachesolr_backdrop_subquery($operator = 'OR') {
   $config = config('apachesolr.settings');
-  if (!interface_exists('DrupalSolrQueryInterface')) {
+  if (!interface_exists('BackdropSolrQueryInterface')) {
     require_once(dirname(__FILE__) . '/apachesolr.interface.inc');
   }
 
@@ -1685,13 +1685,13 @@ function apachesolr_drupal_subquery($operator = 'OR') {
  *
  * @param $env_id
  *   Environment from which to save or get the current query
- * @param DrupalSolrQueryInterface $query
+ * @param BackdropSolrQueryInterface $query
  *   $query object to save in the static
  *
- * @return DrupalSolrQueryInterface|null
+ * @return BackdropSolrQueryInterface|null
  *   return the $query object if it is available in the drupal_static or null otherwise
  */
-function apachesolr_current_query($env_id, DrupalSolrQueryInterface $query = NULL) {
+function apachesolr_current_query($env_id, BackdropSolrQueryInterface $query = NULL) {
   $saved_query = &backdrop_static(__FUNCTION__, NULL);
   if (is_object($query)) {
     $saved_query[$env_id] = clone $query;
@@ -3089,11 +3089,11 @@ function apachesolr_config_info() {
 
 function apachesolr_autoload_info() {
   return array(
-    'DrupalApacheSolrService' => 'Drupal_Apache_Solr_Service.php',
+    'BackdropApacheSolrService' => 'Backdrop_Apache_Solr_Service.php',
     'ApacheSolrDocument' => 'Apache_Solr_Document.php',
     'SolrBaseQuery' => 'Solr_Base_Query.php',
     'SolrFilterSubQuery' => 'Solr_Base_Query.php',
-    'DrupalSolrQueryInterface' => 'apachesolr.interface.inc',
+    'BackdropSolrQueryInterface' => 'apachesolr.interface.inc',
     'ApacheSolrFacetapiAdapter' => 'plugins/facetapi/adapter.inc',
     'ApacheSolrFacetapiDate' => 'plugins/facetapi/query_type_date.inc',
     'ApacheSolrFacetapiGeo' => 'plugins/facetapi/query_type_geo.inc',

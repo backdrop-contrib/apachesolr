@@ -255,7 +255,7 @@ class SolrFilterSubQuery {
 
 }
 
-class SolrBaseQuery extends SolrFilterSubQuery implements DrupalSolrQueryInterface {
+class SolrBaseQuery extends SolrFilterSubQuery implements BackdropSolrQueryInterface {
 
   /**
    * The parameters that get sent to Solr.
@@ -575,7 +575,7 @@ class SolrBaseQuery extends SolrFilterSubQuery implements DrupalSolrQueryInterfa
    * @param $field_map
    *   An array keyed with real Solr index field names with the alias as value.
    *
-   * @return DrupalSolrQueryInterface
+   * @return BackdropSolrQueryInterface
    *   The called object.
    */
   public function addFieldAliases($field_map) {

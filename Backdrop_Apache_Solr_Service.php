@@ -63,7 +63,7 @@
  * methods for pinging, adding, deleting, committing, optimizing and searching.
  */
 
-class DrupalApacheSolrService implements DrupalApacheSolrServiceInterface {
+class BackdropApacheSolrService implements BackdropApacheSolrServiceInterface {
   /**
    * How NamedLists should be formatted in the output.  This specifically effects facet counts. Valid values
    * are 'map' (default) or 'flat'.
@@ -587,7 +587,7 @@ class DrupalApacheSolrService implements DrupalApacheSolrServiceInterface {
   /**
    * Escape a value for special query characters such as ':', '(', ')', '*', '?', etc.
    *
-   * NOTE: inside a phrase fewer characters need escaped, use {@link DrupalApacheSolrService::escapePhrase()} instead
+   * NOTE: inside a phrase fewer characters need escaped, use {@link BackdropApacheSolrService::escapePhrase()} instead
    *
    * @param string $value
    * @return string

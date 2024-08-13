@@ -480,12 +480,12 @@ function apachesolr_search_block_info() {
   // Get all of the moreLikeThis blocks that the user has created
   $blocks = apachesolr_search_load_all_mlt_blocks();
   foreach ($blocks as $delta => $settings) {
-    $blocks[$delta] += array('info' => t('Apache Solr recommendations: !name', array('!name' => $settings['name'])) , 'cache' => DRUPAL_CACHE_PER_PAGE);
+    $blocks[$delta] += array('info' => t('Apache Solr recommendations: !name', array('!name' => $settings['name'])) , 'cache' => BACKDROP_CACHE_PER_PAGE);
   }
   // Add the sort block.
   $blocks['sort'] = array(
     'info' => t('Apache Solr Core: Sorting'),
-    'cache' => DRUPAL_NO_CACHE,
+    'cache' => BACKDROP_NO_CACHE,
   );
   return $blocks;
 }
@@ -706,7 +706,7 @@ function apachesolr_search_mlt_suggestions($settings, $id, $solr = NULL, $contex
       'rows' => $settings['num_results'],
     );
     // We can optionally specify a Solr object.
-    $query = apachesolr_drupal_query('apachesolr_mlt', $params, '', '', $solr, $context);
+    $query = apachesolr_backdrop_query('apachesolr_mlt', $params, '', '', $solr, $context);
 
     foreach ($fields as $form_key => $name) {
       if (!empty($settings[$form_key])) {
@@ -991,7 +991,7 @@ function apachesolr_search_conditions_default($search_page) {
     foreach($conditions['fq'] as $condition_id => $condition) {
       // If the user input does not pass our validation we do not allow
       // it to query solr
-      $test_query = apachesolr_drupal_subquery('Test');
+      $test_query = apachesolr_backdrop_subquery('Test');
       if (!$test_query->validFilterValue($condition)) {
         unset($conditions['fq'][$condition_id]);
       }
@@ -1111,7 +1111,7 @@ function theme_apachesolr_search_browse_blocks($vars) {
  * Execute a search with zero results rows so as to populate facets.
  */
 function apachesolr_search_run_empty($name, array $params = array(), $base_path = '', $solr = NULL, $context = array()) {
-  $query = apachesolr_drupal_query($name, $params, '', $base_path, $solr, $context);
+  $query = apachesolr_backdrop_query($name, $params, '', $base_path, $solr, $context);
   $query->addParam('rows', '0');
   $solr_id = $query->solr('getId');
   list($final_query, $response) = apachesolr_do_query($query);
@@ -1130,18 +1130,18 @@ function apachesolr_search_run_empty($name, array $params = array(), $base_path 
  *   other than the base path of the current request.
  * @param integer $page
  *   For pagination.
- * @param DrupalApacheSolrServiceInterface $solr
+ * @param BackdropApacheSolrServiceInterface $solr
  *   The solr server resource to execute the search on.
  *
  * @return array The returned search results.
  *
  * @throws Exception
  */
-function apachesolr_search_run($name, array $params = array(), $solrsort = '', $base_path = '', $page = 0, DrupalApacheSolrServiceInterface $solr = NULL, $context = array()) {
+function apachesolr_search_run($name, array $params = array(), $solrsort = '', $base_path = '', $page = 0, BackdropApacheSolrServiceInterface $solr = NULL, $context = array()) {
   // Merge the default params into the params sent in.
   $params += apachesolr_search_basic_params();
   // This is the object that knows about the query coming from the user.
-  $query = apachesolr_drupal_query($name, $params, $solrsort, $base_path, $solr, $context);
+  $query = apachesolr_backdrop_query($name, $params, $solrsort, $base_path, $solr, $context);
 
   if ($query->getParam('q')) {
     apachesolr_search_add_spellcheck_params($query);
@@ -1187,7 +1187,7 @@ function apachesolr_search_run($name, array $params = array(), $solrsort = '', $
   }
 }
 
-function apachesolr_search_basic_params(DrupalSolrQueryInterface $query = NULL) {
+function apachesolr_search_basic_params(BackdropSolrQueryInterface $query = NULL) {
   $params = array(
     'fl' => array(
         'id',
@@ -1230,7 +1230,7 @@ function apachesolr_search_basic_params(DrupalSolrQueryInterface $query = NULL) 
  * See the defaults there.
  * If you wish to override them, you can via settings.php or drush
  */
-function apachesolr_search_highlighting_params(DrupalSolrQueryInterface $query = NULL) {
+function apachesolr_search_highlighting_params(BackdropSolrQueryInterface $query = NULL) {
   $config = config('apachesolr.settings');
   $params['hl'] = $config->get('apachesolr_hl_active');
   $params['hl.fragsize']= $config->get('apachesolr_hl_textsnippetlength');
@@ -1246,7 +1246,7 @@ function apachesolr_search_highlighting_params(DrupalSolrQueryInterface $query =
   return $params;
 }
 
-function apachesolr_search_add_spellcheck_params(DrupalSolrQueryInterface $query) {
+function apachesolr_search_add_spellcheck_params(BackdropSolrQueryInterface $query) {
   $params = array();
 
   // Add new parameter to the search request
@@ -1255,7 +1255,7 @@ function apachesolr_search_add_spellcheck_params(DrupalSolrQueryInterface $query
   $query->addParams($params);
 }
 
-function apachesolr_search_add_boost_params(DrupalSolrQueryInterface $query) {
+function apachesolr_search_add_boost_params(BackdropSolrQueryInterface $query) {
   $env_id = $query->solr('getId');
   $params = array();
 
@@ -1336,7 +1336,7 @@ function apachesolr_search_add_boost_params(DrupalSolrQueryInterface $query) {
   $query->addParams($params);
 }
 
-function apachesolr_search_process_response($response, DrupalSolrQueryInterface $query) {
+function apachesolr_search_process_response($response, BackdropSolrQueryInterface $query) {
   $results = array();
   // We default to getting snippets from the body content and comments.
   $hl_fl = $query->getParam('hl.fl');

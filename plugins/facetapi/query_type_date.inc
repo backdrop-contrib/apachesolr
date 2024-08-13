@@ -23,7 +23,7 @@ class ApacheSolrFacetapiDate extends FacetapiQueryTypeDate implements FacetapiQu
   /**
    * Adds the filter to the query object.
    *
-   * @param DrupalSolrQueryInterface $query
+   * @param BackdropSolrQueryInterface $query
    *   An object containing the query in the backend's native API.
    */
   public function execute($query) {
@@ -56,13 +56,13 @@ class ApacheSolrFacetapiDate extends FacetapiQueryTypeDate implements FacetapiQu
   /**
    * Gets the range of dates we are using.
    *
-   * @param DrupalSolrQueryInterface $query
+   * @param BackdropSolrQueryInterface $query
    *   A SolrBaseQuery object.
    *
    * @return bool|array
    *   An array containing the gap and range information or false if not present
    */
-  function getDateRange(DrupalSolrQueryInterface $query) {
+  function getDateRange(BackdropSolrQueryInterface $query) {
     $return = NULL;
     $gap = NULL;
 

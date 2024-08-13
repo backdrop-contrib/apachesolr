@@ -22,7 +22,7 @@ class ApacheSolrFacetapiGeo extends FacetapiQueryType implements FacetapiQueryTy
   /**
    * Adds the filter to the query object.
    *
-   * @param DrupalSolrQueryInterface $query
+   * @param BackdropSolrQueryInterface $query
    *   An object containing the query in the backend's native API.
    */
   public function execute($query) {
