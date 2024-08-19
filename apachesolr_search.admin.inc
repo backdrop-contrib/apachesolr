@@ -108,8 +108,7 @@ function apachesolr_search_page_list_pages() {
   }
 
   // Automatically enlarge our header with the operations size
-  reset($rows);
-  $header['operations']['colspan'] = count($rows) - 3;
+  $header['operations']['colspan'] = count($rows) + 3;
 
   $build['list'] = array(
     '#prefix' => '<h3>Pages</h3>',
@@ -165,8 +164,7 @@ function apachesolr_search_page_list_blocks() {
   }
 
   // Automatically enlarge our header with the operations size
-  reset($rows);
-  $header['operations']['colspan'] = count($rows) - 2;
+  $header['operations']['colspan'] = count($rows) + 2;
 
   $build['list'] = array(
     '#prefix' => '<h3>Blocks "More Like This"</h3>',
