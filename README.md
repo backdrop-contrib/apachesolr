@@ -1,27 +1,7 @@
+Apache Solr Search
+======================
 
-This module integrates Backdrop with the Apache Solr search platform. Solr search
-can be used as a replacement for core content search and boasts both extra
-features and better performance. Among the extra features is the ability to have
-faceted search on facets ranging from content author to taxonomy to arbitrary
-Field API fields.
-
-The module comes with a schema.xml, solrconfig.xml, and protwords.txt file which
-must be used in your Solr installation.
-
-This module depends on the search framework in core.  When used in combination
-with core search module, Apache Solr is not the default search. Access it via a
-new tab on the default search page, called "Site".  You may configure it
-to be default at ?q=admin/config/search/settings
-
-Updating from 6.x
------------------
-
-IMPORTANT: there is no upgrade path from 6.x-1.x or 6.x-2.x. If you previously
-installed those modules you must disable and uninstall them prior to
-installing 7.x-1.x.
-
-You will have to install the new schema.xml and solrconfig.xml files, and restart
-the Solr server (or core) and delete your index and reindex all content.
+This module integrates Backdrop with the Apache Solr search platform. Solr search can be used as a replacement for core content search and boasts both extra features and better performance.
 
 Installation
 ------------
@@ -166,38 +146,26 @@ behavior:
  - apachesolr_index_user: Define with which user you want the index process to
    happen.
 
-Troubleshooting
----------------
-Problem:
-You use http basic auth to limit access to your Solr server.
+Issues
+------
 
-Solution:
-Set the Server URL to include the username and password like
-http://username:password@example.com:8080/solr
+Bugs and feature requests should be reported in [the Issue Queue](https://github.com/backdrop-contrib/apachesolr/issues).
 
-Problem:
-Links to nodes appear in the search results with a different host name or
-subdomain than is preferred.  e.g. sometimes at http://example.com
-and sometimes at http://www.example.com
+Current Maintainers
+-------------------
 
-Solution:
-Set $base_url in settings.php to insure that an identical absolute url is
-generated at all times when nodes are indexed.  Alternately, set up a re-direct
-in .htaccess to prevent site visitors from accessing the site via more than one
-site address.
+- [Eli Lisseck](https://github.com/elisseck).
+- [Anthony Nemirovsky](https://github.com/anemirovsky).
 
-Problem:
-The 'Solr Index Queries' test fails with file permission errors.
+Credits
+-------
 
-Solution:
-When running this test you should have your tomcat/jetty running as the same user
-as the user under which PHP runs (often the same as the webserver). This is
-important because of the on-the-fly folder creation within PHP.
+- Backdrop development supported by [USENIX](https://www.usenix.org/).
+- Backdrop development supported by [Giant Rabbit](https://giantrabbit.com).
+- Ported to Backdrop CMS by [Alejandro Madrigal](https://github.com/alemadlei) & [Eli Lisseck](https://github.com/elisseck).
 
+License
+-------
 
-Themers
-----------------
-
-See inline docs in apachesolr_theme and apachesolr_search_theme functions
-within apachesolr.module and apachesolr_search.module.
-
+This project is GPL v2 software.
+See the LICENSE.txt file in this directory for complete text.
